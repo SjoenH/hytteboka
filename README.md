@@ -14,7 +14,13 @@ På kurset bygger deltakerne sin egen utgave fra en tom mappe. Denne er til å s
 >
 > Kan du ha noe å vise meg i dag?
 
-Rammene var at den skal kjøre på egen maskin med én kommando, uten sky og uten innlogging.
+Rammene var at den skal kjøre på egen maskin med én kommando, uten sky og uten innlogging. Det gjør den, med ett unntak: sidene henter Miles' to skrifter utenfra, Gelica fra Adobes fontpakke for Miles og DM Sans fra Google Fonts. Uten nett virker alt som før, med Georgia og maskinens egen skrift i stedet.
+
+## Slik ble den
+
+Kunden rettet og la til underveis. Hytteuka går fra fredag til fredag, og de som reiser, er ute til klokka tolv. Ingen vinner to trekninger samme år, en uke som er tatt har venteliste, og den som har en uke, kan legge den i kalenderen sin. Fredagsoversikten over hvem som har hytta, lages med `/oversikt` i Claude Code.
+
+Til slutt skulle boka vises hos Miles, og fikk Miles' utseende og språk. `bilder/` viser kalenderen og en trekning før og etter.
 
 ## Kjør den
 
@@ -28,4 +34,4 @@ Testene kjører du med `npm test`.
 
 ## Hva den ikke er
 
-Den er ikke ment for ekte bruk. Det er ingen innlogging, så alle kan skrive hvilket som helst navn, og alt ligger i én fil på maskinen. Det som ble antatt på kundens vegne, står i [ANTAKELSER.md](ANTAKELSER.md).
+Den er ikke ment for ekte bruk. Det er ingen innlogging, så alle kan skrive hvilket som helst navn, og alt ligger i én fil på maskinen. Det kunden har avklart, og det som ble antatt på hennes vegne, står i [ANTAKELSER.md](ANTAKELSER.md).
