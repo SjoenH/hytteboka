@@ -1,32 +1,64 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  addWeeks, currentWeek, easterSunday, formatMoment, formatRange, isWeekId, mondayOf, monthOf, weekIdOf, weekNumber,
-  weeksFrom,
+  addWeeks, currentWeek, easterSunday, easterWeek, endOf, formatMoment, formatRange, isWeekId, monthOf, startOf,
+  weekNumber, weeksFrom,
 } from '../src/weeks.js';
 
-const day = (text) => new Date(`${text}T00:00:00Z`);
+const SATURDAY = 6;
 const iso = (date) => date.toISOString().slice(0, 10);
 
-test('a week runs from Monday to Sunday', () => {
-  assert.equal(weekIdOf(day('2026-10-11')), '2026-W41');
-  assert.equal(weekIdOf(day('2026-10-12')), '2026-W42');
-  assert.equal(weekIdOf(day('2026-10-18')), '2026-W42');
-  assert.equal(weekIdOf(day('2026-10-19')), '2026-W43');
+test('a week runs from a Saturday to the next Saturday', () => {
+  assert.equal(iso(startOf('2026-W42')), '2026-10-10');
+  assert.equal(iso(endOf('2026-W42')), '2026-10-17');
+
+  for (const week of weeksFrom('2026-W40', 120)) {
+    assert.equal(startOf(week).getUTCDay(), SATURDAY, `${week} starts on a Saturday`);
+    assert.equal(endOf(week).getUTCDay(), SATURDAY, `${week} ends on a Saturday`);
+    assert.equal(iso(endOf(week)), iso(startOf(addWeeks(week, 1))), `${week} ends the day the next one starts`);
+  }
 });
 
-test('the days around New Year belong to the week they are in, not the year', () => {
-  assert.equal(weekIdOf(day('2026-12-31')), '2026-W53');
-  assert.equal(weekIdOf(day('2027-01-03')), '2026-W53');
-  assert.equal(weekIdOf(day('2027-01-04')), '2027-W01');
-  assert.equal(weekIdOf(day('2024-12-30')), '2025-W01');
+test('a week is named after the working week inside it, and starts the Saturday before', () => {
+  // Week 8 of 2027 in the calendar is Monday 22 to Sunday 28 February.
+  assert.equal(iso(startOf('2027-W08')), '2027-02-20');
+  assert.equal(iso(endOf('2027-W08')), '2027-02-27');
+  // Week 12 is Monday 22 to Sunday 28 March.
+  assert.equal(iso(startOf('2027-W12')), '2027-03-20');
+  assert.equal(iso(endOf('2027-W12')), '2027-03-27');
 });
 
-test('a week starts on its Monday', () => {
-  assert.equal(iso(mondayOf('2026-W42')), '2026-10-12');
-  assert.equal(iso(mondayOf('2027-W12')), '2027-03-22');
-  assert.equal(iso(mondayOf('2026-W53')), '2026-12-28');
-  assert.equal(iso(mondayOf('2027-W01')), '2027-01-04');
+test('a week around New Year starts in the old year', () => {
+  assert.equal(iso(startOf('2026-W53')), '2026-12-26');
+  assert.equal(iso(endOf('2026-W53')), '2027-01-02');
+  assert.equal(iso(startOf('2027-W01')), '2027-01-02');
+  assert.equal(iso(startOf('2026-W01')), '2025-12-27');
+});
+
+test('the week changes on Saturday at twelve, Norwegian time', () => {
+  // Summer time: twelve in Norway is 10:00 UTC.
+  assert.equal(currentWeek(new Date('2026-10-10T09:59:59Z')), '2026-W41');
+  assert.equal(currentWeek(new Date('2026-10-10T10:00:00Z')), '2026-W42');
+  assert.equal(currentWeek(new Date('2026-10-17T09:59:59Z')), '2026-W42');
+  assert.equal(currentWeek(new Date('2026-10-17T10:00:00Z')), '2026-W43');
+});
+
+test('the week does not change at any other time', () => {
+  // Saturday evening, the night to Monday, and the last minute before Saturday: all in the week of 10 to 17 October.
+  assert.equal(currentWeek(new Date('2026-10-10T21:00:00Z')), '2026-W42');
+  assert.equal(currentWeek(new Date('2026-10-11T21:59:59Z')), '2026-W42');
+  assert.equal(currentWeek(new Date('2026-10-11T22:00:00Z')), '2026-W42');
+  assert.equal(currentWeek(new Date('2026-10-14T10:00:00Z')), '2026-W42');
+  assert.equal(currentWeek(new Date('2026-10-16T21:59:59Z')), '2026-W42');
+});
+
+test('twelve is twelve on the clock in Norway, in winter time too', () => {
+  // The clock was set back on 25 October 2026: twelve is now 11:00 UTC.
+  assert.equal(currentWeek(new Date('2026-10-31T10:59:59Z')), '2026-W44');
+  assert.equal(currentWeek(new Date('2026-10-31T11:00:00Z')), '2026-W45');
+  // The Saturday the first week of 2027 starts on.
+  assert.equal(currentWeek(new Date('2027-01-02T10:59:59Z')), '2026-W53');
+  assert.equal(currentWeek(new Date('2027-01-02T11:00:00Z')), '2027-W01');
 });
 
 test('only weeks that exist are weeks', () => {
@@ -36,6 +68,8 @@ test('only weeks that exist are weeks', () => {
   assert.equal(isWeekId('2027-W1'), false);
   assert.equal(isWeekId('uke 12'), false);
   assert.equal(isWeekId(undefined), false);
+  assert.equal(startOf('2027-W53'), null);
+  assert.equal(endOf('uke 12'), null);
 });
 
 test('weeks are counted across New Year', () => {
@@ -49,15 +83,6 @@ test('weeks sort as text', () => {
   assert.deepEqual([...weeks].sort(), weeks);
 });
 
-test('the week changes at midnight in Norway', () => {
-  // Summer time: midnight in Oslo is 22:00 UTC.
-  assert.equal(currentWeek(new Date('2026-10-11T21:59:59Z')), '2026-W41');
-  assert.equal(currentWeek(new Date('2026-10-11T22:00:00Z')), '2026-W42');
-  // Winter time: midnight in Oslo is 23:00 UTC.
-  assert.equal(currentWeek(new Date('2027-01-03T22:59:59Z')), '2026-W53');
-  assert.equal(currentWeek(new Date('2027-01-03T23:00:00Z')), '2027-W01');
-});
-
 test('Easter Sunday falls where the almanac says', () => {
   assert.equal(iso(easterSunday(2025)), '2025-04-20');
   assert.equal(iso(easterSunday(2026)), '2026-04-05');
@@ -66,17 +91,28 @@ test('Easter Sunday falls where the almanac says', () => {
   assert.equal(iso(easterSunday(2038)), '2038-04-25');
 });
 
-test('a week is written with its dates', () => {
-  assert.equal(formatRange('2027-W12'), '22.–28. mars 2027');
-  assert.equal(formatRange('2027-W13'), '29. mars – 4. april 2027');
-  assert.equal(formatRange('2026-W53'), '28. desember 2026 – 3. januar 2027');
-  assert.equal(formatRange('2027-W12', { year: false }), '22.–28. mars');
-  assert.equal(formatRange('2026-W53', { year: false }), '28. desember – 3. januar');
+test('the week of Easter has Maundy Thursday and Good Friday in it, and ends on Easter Saturday', () => {
+  assert.equal(easterWeek(2027), '2027-W12');
+  assert.equal(iso(startOf(easterWeek(2027))), '2027-03-20', 'the Saturday before Palm Sunday');
+  assert.equal(iso(endOf(easterWeek(2027))), '2027-03-27', 'the day before Easter Sunday');
+
+  assert.equal(easterWeek(2026), '2026-W14');
+  assert.equal(iso(endOf(easterWeek(2026))), '2026-04-04');
 });
 
-test('a week is listed under the month most of it falls in', () => {
+test('a week is written with the two Saturdays it runs between', () => {
+  assert.equal(formatRange('2027-W12'), 'lør. 20. – lør. 27. mars 2027');
+  assert.equal(formatRange('2027-W13'), 'lør. 27. mars – lør. 3. april 2027');
+  assert.equal(formatRange('2026-W53'), 'lør. 26. desember 2026 – lør. 2. januar 2027');
+  assert.equal(formatRange('2027-W12', { year: false }), 'lør. 20. – lør. 27. mars');
+  assert.equal(formatRange('2026-W53', { year: false }), 'lør. 26. desember – lør. 2. januar');
+});
+
+test('a week is listed under the month most of its nights fall in', () => {
   assert.equal(monthOf('2027-W12'), 'Mars 2027');
-  assert.equal(monthOf('2027-W13'), 'April 2027');
+  assert.equal(monthOf('2027-W13'), 'Mars 2027', 'five nights in March, two in April');
+  assert.equal(monthOf('2027-W14'), 'April 2027');
+  assert.equal(monthOf('2026-W49'), 'Desember 2026', 'three nights in November, four in December');
   assert.equal(monthOf('2026-W53'), 'Desember 2026');
 });
 

@@ -5,6 +5,7 @@
 //   bookings: { [week]: { name, at } }                       who has the cabin that week
 //   draws:    { [week]: { label, entries: [{ name, at }] } } the weeks a winner is drawn for
 //
+// A week is a week on the cabin, Saturday to Saturday: `weeks.js` says which days that is.
 // A week has at most one booking, since bookings are kept by week.
 // A draw is done when its week has a booking: that booking is the winner, and its `at` is when it was drawn.
 //
@@ -12,7 +13,7 @@
 // { ok: true }, or leaves it as it was and answers { ok: false, status, message } with words for the person.
 
 import { randomInt } from 'node:crypto';
-import { addWeeks, currentWeek, easterSunday, isWeekId, weekIdOf, weekNumber, weeksFrom } from './weeks.js';
+import { addWeeks, currentWeek, easterWeek, isWeekId, weekNumber, weeksFrom } from './weeks.js';
 
 /** How many weeks are shown and can be booked, counting the one we are in. */
 export const HORIZON = 52;
@@ -32,7 +33,7 @@ export function firstState(now = new Date()) {
   const next = (weekIn) => [weekIn(year), weekIn(year + 1)].find((week) => isOpen(week, today));
 
   const winterBreak = next((y) => `${y}-W08`);
-  const easter = next((y) => weekIdOf(easterSunday(y)));
+  const easter = next(easterWeek);
   if (winterBreak) state.draws[winterBreak] = { label: 'Vinterferie', entries: [] };
   if (easter) state.draws[easter] = { label: 'Påske', entries: [] };
   return state;

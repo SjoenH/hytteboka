@@ -5,7 +5,7 @@ import {
   unmarkDraw, withdraw,
 } from '../src/cabin.js';
 
-// The week the tests happen in: 12 to 18 October 2026.
+// The week the tests happen in: Saturday 10 to Saturday 17 October 2026.
 const TODAY = '2026-W42';
 const AUTUMN = '2026-W45';
 const EASTER = '2027-W12';
@@ -283,6 +283,12 @@ describe('the book as it is shown', () => {
   test('a new book takes this year’s weeks while they are still ahead', () => {
     const state = firstState(new Date('2027-01-11T12:00:00Z'));
     assert.deepEqual(Object.keys(state.draws), ['2027-W08', '2027-W12']);
+  });
+
+  test('Easter is still ahead until twelve on Easter Saturday, when its week ends', () => {
+    // Easter Saturday 2027 is 27 March, in winter time: twelve in Norway is 11:00 UTC.
+    assert.deepEqual(Object.keys(firstState(new Date('2027-03-27T10:59:00Z')).draws), ['2028-W08', '2027-W12']);
+    assert.deepEqual(Object.keys(firstState(new Date('2027-03-27T11:00:00Z')).draws), ['2028-W08']);
   });
 
   test('a new book leaves out an Easter that is more than 52 weeks away', () => {

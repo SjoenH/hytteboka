@@ -2,60 +2,74 @@
 
 Ragnhild var ikke å få tak i før første versjon ble bygget. Her er det jeg ville ha spurt om, og svaret jeg har bygget etter. Alt kan endres; si fra om det som er feil.
 
+Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt antakelser.
+
+## Avklart av Ragnhild
+
+- **Hva er «en uke» på hytta?**
+  Hytteuka går alltid fra lørdag til lørdag, og de som reiser, er ute til klokka tolv. (Svar 11. oktober 2026.)
+  Første versjon antok mandag til søndag, og at folk avtalte byttet seg imellom. Det var feil.
+
 ## Uker og booking
 
-1. **Hva er «en uke» på hytta?**
-   Antar: mandag til søndag, altså vanlige ukenumre (uke 8, uke 12). Når på dagen man bytter, avtaler folk seg imellom.
+1. **Hvilken hytteuke er «uke 8»?**
+   Antar: den som har mandag til fredag i uke 8 i seg. Den går fra lørdagen før uke 8 til lørdagen i uke 8.
 
-2. **Lånes hytta bare ut for hele uker?**
+2. **Når kan de neste komme?**
+   Antar: fra klokka tolv samme lørdag. Siden sier bare når de som reiser, skal være ute; den regner uka som den nestes fra da.
+
+3. **Lånes hytta bare ut for hele uker?**
    Antar: ja. Én booking er hele hytta i hele uka. Ingen helger eller enkeltdøgn.
 
-3. **Hvor langt fram kan man booke?**
-   Antar: 52 uker, regnet fra uka vi er i. Uka vi er i kan også bookes, så lenge den ikke er over.
+4. **Hvor langt fram kan man booke?**
+   Antar: 52 uker, regnet fra uka vi er i. Uka vi er i kan også bookes, fram til den er over klokka tolv på lørdagen.
 
-4. **Er det en grense for hvor mange uker én person kan ha?**
+5. **Er det en grense for hvor mange uker én person kan ha?**
    Antar: nei. På vanlige uker er det førstemann til mølla.
 
-5. **Kan man angre?**
+6. **Kan man angre?**
    Antar: ja. Den som har en uke, kan si den fra seg, og da er den ledig for alle igjen.
 
-6. **Skal det som står i regnearket i dag, inn?**
+7. **Skal det som står i regnearket i dag, inn?**
    Antar: nei, siden starter tom. Det som alt er avtalt, legger du inn ved å booke i navnet til den det gjelder.
 
 ## Trekning
 
-7. **Hvilke uker skal det trekkes lodd om, og hvem bestemmer det?**
+8. **Hvilke uker skal det trekkes lodd om, og hvem bestemmer det?**
    Antar: du bestemmer, uke for uke, på siden «For kontorsjefen». Påskeuka og uke 8 er lagt inn fra start så det er noe å se på. Vinterferien er uke 8, 9 eller 10 etter hvor i landet dere holder til; uke 8 er en gjetning.
 
-8. **Har alle lik sjanse?**
-   Antar: ja. Ett lodd per person, og den som fikk påsken i fjor, stiller likt med alle andre.
+9. **Hvilken uke er «påsken»?**
+   Antar: uka med skjærtorsdag og langfredag i, fra lørdagen før palmesøndag til påskeaften. Første og andre påskedag faller da i uka etter, som er en vanlig uke.
 
-9. **Kan én person være med i flere trekninger, og vinne flere?**
-   Antar: ja.
+10. **Har alle lik sjanse?**
+    Antar: ja. Ett lodd per person, og den som fikk påsken i fjor, stiller likt med alle andre.
 
-10. **Når stenger påmeldingen?**
+11. **Kan én person være med i flere trekninger, og vinne flere?**
+    Antar: ja.
+
+12. **Når stenger påmeldingen?**
     Antar: i det du trekker. Fram til da kan folk melde seg på og av.
 
-11. **Hva skjer hvis vinneren ikke kan likevel?**
+13. **Hva skjer hvis vinneren ikke kan likevel?**
     Antar: vinneren sier fra seg uka, og du trekker på nytt blant de andre som var påmeldt.
 
-12. **Hvor ser kontoret trekningen?**
+14. **Hvor ser kontoret trekningen?**
     Antar: på én felles skjerm, der du trykker på knappen. Showet går på den skjermen. Andre som har siden oppe, ser hvem som vant når de laster den på nytt.
 
 ## Hvem er hvem
 
-13. **Holder det at folk skriver navnet sitt?**
+15. **Holder det at folk skriver navnet sitt?**
     Antar: ja, og da følger det at alle kan skrive hvilket som helst navn. Hvem som helst kan altså booke eller avbestille for en annen, og hvem som helst kan åpne «For kontorsjefen» og trekke. Første versjon stoler på at folk ikke gjør det.
 
-14. **Hva med to som heter det samme?**
+16. **Hva med to som heter det samme?**
     Antar: folk skriver fullt navn. Store og små bokstaver spiller ingen rolle, så «ola nordmann» og «Ola Nordmann» er samme person. To som heter helt likt, blir én person for siden.
 
-15. **Skal alle se hvem som har booket, og hvem som er med i en trekning?**
+17. **Skal alle se hvem som har booket, og hvem som er med i en trekning?**
     Antar: ja. Navnet står på uka i kalenderen, og alle loddene vises på trekningssiden.
 
 ## Drift
 
-16. **Hvor skal siden stå?**
+18. **Hvor skal siden stå?**
     Antar: i dag på min maskin, for å vise deg. Hvor den skal stå for at alle førti skal nå den, avtaler vi etterpå.
 
 ## Ikke med i første versjon

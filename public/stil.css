@@ -289,6 +289,8 @@ a:active { color: var(--cabin); }
   font-size: 1.1rem;
 }
 
+.hero-text .hero-rule { font-weight: 600; }
+
 .art-far { fill: color-mix(in oklch, var(--night) 55%, var(--sky)); }
 .art-near { fill: color-mix(in oklch, var(--night) 30%, var(--sky)); }
 .art-snow { fill: var(--paper); }
