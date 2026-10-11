@@ -22,6 +22,8 @@ Kunden rettet og la til underveis. Hytteuka går fra fredag til fredag, og de so
 
 Til slutt skulle boka vises hos Miles, og fikk Miles' utseende og språk. `bilder/` viser kalenderen og en trekning før og etter.
 
+Hele historien står i [HISTORIEN.md](HISTORIEN.md): hva kunden sa i hver runde, prompten agenten fikk, hva som kom tilbake, hva vi la merke til, og et bilde av siden slik den så ut da.
+
 ## Kjør den
 
 ```
