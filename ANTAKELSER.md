@@ -32,7 +32,7 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
    Antar: nei. På vanlige uker er det førstemann til mølla.
 
 6. **Kan man angre?**
-   Antar: ja. Den som har en uke, kan si den fra seg, og da er den ledig for alle igjen.
+   Antar: ja. Den som har en uke, kan si den fra seg. Da går den til den første på ventelista (punkt 36), og er ledig for alle igjen om ingen venter.
 
 7. **Skal det som står i regnearket i dag, inn?**
    Antar: nei, siden starter tom. Det som alt er avtalt, legger du inn ved å booke i navnet til den det gjelder.
@@ -141,7 +141,7 @@ Du ba om «en venteliste når uka er tatt». Hvordan den skal virke, sa du ikke,
     Antar: uka går rett til den som har ventet lengst, uten at noen må si ja. De andre rykker én plass fram. Venter ingen, er uka ledig for alle, som før.
 
 37. **Hvordan får den som ventet, vite at uka er deres?**
-    Antar: på siden. Det står øverst i kalenderen når de åpner den, og på uka, med navnet på den som sa den fra seg. Det blir stående til uka er over. Siden sender ikke e-post, så ingen får vite noe uten å åpne den. Den som sier fra seg en uke, ser hvem den går til, og bør si fra til dem.
+    Antar: på siden. Det står øverst i kalenderen når de åpner den, og på uka, med navnet på den som sa den fra seg. Det blir stående til uka er over. Siden sender ikke e-post, så ingen får vite noe uten å åpne den. Den som sier fra seg en uke, ser hvem den går til, og bør si fra til dem. Uka kommer heller ikke inn i kalenderen deres av seg selv: de finner «Legg i kalenderen din» på uka, og henter filen som alle andre (punkt 28).
 
 38. **Hva om den som får uka, ikke kan likevel?**
     Antar: de sier den fra seg, og da går den til neste på ventelista.

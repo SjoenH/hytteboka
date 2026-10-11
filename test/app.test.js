@@ -815,7 +815,7 @@ describe('the booking in your own calendar', () => {
     assert.equal(event.SUMMARY, 'Firmahytta\\, uke 12');
   });
 
-  test('a week Ola gives up has no file any more, and is another event when Kari books it', async () => {
+  test('a week Ola gives up with nobody waiting has no file any more, and is another event when Kari books it', async () => {
     await ola.post(`/uker/${AUTUMN}/book`);
     const his = lines(await (await ola.get(FILE)).text());
     await ola.post(`/uker/${AUTUMN}/avbestill`);
@@ -860,6 +860,124 @@ describe('the booking in your own calendar', () => {
 
     assert.equal(text.match(/^END:VEVENT\r$/gm).length, 1);
     assert.match(lines(text).DESCRIPTION, /^Hansen\\, Kari\\; \\\\n END:VEVENT har firmahytta denne uka\./);
+  });
+});
+
+// Where the waiting list and the calendar file meet. The two were built apart: a week now comes to
+// someone without their booking it, and a week that is given up may have a new owner at once.
+describe('a week from the waiting list, in your own calendar', () => {
+  const FILE = `/uker/${AUTUMN}/kalender.ics`;
+  const WEEK = 'Uke 45 lør. 31. oktober – lør. 7. november';
+  const GIVEN_UP = new Date('2026-10-20T07:30:00Z');
+  /** The lines of a calendar file, by name, with lines that were broken put together again. */
+  const lines = (text) =>
+    Object.fromEntries(text.replace(/\r\n /g, '').split('\r\n').map((line) => line.split(/:(.*)/s).slice(0, 2)));
+  const event = async (who) => lines(await (await who.get(FILE)).text());
+  /** The weeks someone is offered for their calendar. */
+  const offered = async (who) =>
+    [...(await (await who.get('/')).text()).matchAll(/href="\/uker\/([^"/]+)\/kalender\.ics"/g)].map((found) => found[1]);
+
+  /** Ola has the week, Kari and Per wait for it in that order, and six days later Ola gives it up. */
+  const olaGivesTheWeekToKari = async () => {
+    await ola.post(`/uker/${AUTUMN}/book`);
+    await kari.post(`/uker/${AUTUMN}/vent`);
+    await per.post(`/uker/${AUTUMN}/vent`);
+    now = GIVEN_UP;
+    assert.equal((await ola.post(`/uker/${AUTUMN}/avbestill`)).status, 303);
+  };
+
+  test('someone who waits for a week is not offered it for their calendar', async () => {
+    await ola.post(`/uker/${AUTUMN}/book`);
+    await kari.post(`/uker/${AUTUMN}/vent`);
+
+    assert.deepEqual(await offered(ola), [AUTUMN]);
+    assert.deepEqual(await offered(kari), []);
+  });
+
+  test('the one who gets the week from the waiting list finds the way to her calendar on it', async () => {
+    await olaGivesTheWeekToKari();
+
+    assert.equal(await card(kari, AUTUMN), [
+      WEEK, 'Du har hytta', 'Fra ventelista, etter Ola Nordmann',
+      'På venteliste: Per Olsen', 'Sier du fra seg uka, går den til Per Olsen.',
+      'Si fra deg uka', 'Legg i kalenderen din',
+    ].join(' '));
+    assert.deepEqual(await offered(kari), [AUTUMN]);
+  });
+
+  test('the one who gave the week up, and the one still waiting, are not offered it', async () => {
+    await olaGivesTheWeekToKari();
+
+    assert.deepEqual(await offered(ola), []);
+    assert.deepEqual(await offered(per), []);
+    assert.doesNotMatch(await card(ola, AUTUMN), /kalender/i);
+  });
+
+  test('the file is hers: her name, an event of its own, made the moment the week came to her', async () => {
+    await ola.post(`/uker/${AUTUMN}/book`);
+    const his = await event(ola);
+    await olaGivesTheWeekToKari();
+    const hers = await event(kari);
+
+    assert.match(hers.DESCRIPTION, /^Kari Hansen har firmahytta denne uka\./);
+    assert.doesNotMatch(hers.DESCRIPTION, /Ola Nordmann/);
+    assert.notEqual(hers.UID, his.UID, 'a calendar that has his event takes hers as another');
+    assert.equal(his.DTSTAMP, '20261014T100000Z', 'his was made when he booked');
+    assert.equal(hers.DTSTAMP, '20261020T073000Z', 'hers when he gave the week up');
+    assert.deepEqual([hers.DTSTART, hers.DTEND, hers.SUMMARY], [his.DTSTART, his.DTEND, his.SUMMARY], 'the week is the same');
+    assert.equal((await kari.get(FILE)).headers.get('content-disposition'), 'attachment; filename="hytta-2026-uke-45.ics"');
+  });
+
+  test('a week given up with someone waiting still has a file, and it is the new owner’s', async () => {
+    // With nobody waiting the address answers 404 after the week is given up. Here it never does:
+    // the week has an owner the whole time, and the file follows the week, not the one who asks.
+    await olaGivesTheWeekToKari();
+
+    const response = await ola.get(FILE);
+    assert.equal(response.status, 200);
+    assert.match(lines(await response.text()).DESCRIPTION, /^Kari Hansen har firmahytta denne uka\./);
+  });
+
+  test('when she gives it up in turn, the link and the file are the next one’s', async () => {
+    await olaGivesTheWeekToKari();
+    const hers = await event(kari);
+    now = new Date('2026-10-21T09:00:00Z');
+    await kari.post(`/uker/${AUTUMN}/avbestill`);
+
+    const his = await event(per);
+    assert.match(his.DESCRIPTION, /^Per Olsen har firmahytta denne uka\./);
+    assert.notEqual(his.UID, hers.UID);
+    assert.equal(his.DTSTAMP, '20261021T090000Z');
+    assert.deepEqual(await offered(per), [AUTUMN]);
+    assert.deepEqual(await offered(kari), []);
+  });
+
+  test('a week that comes back to someone from the waiting list is another event than the first time', async () => {
+    await kari.post(`/uker/${AUTUMN}/book`);
+    const first = await event(kari);
+    await ola.post(`/uker/${AUTUMN}/vent`);
+    now = GIVEN_UP;
+    await kari.post(`/uker/${AUTUMN}/avbestill`);
+    await kari.post(`/uker/${AUTUMN}/vent`);
+    now = new Date('2026-10-21T09:00:00Z');
+    await ola.post(`/uker/${AUTUMN}/avbestill`);
+
+    const again = await event(kari);
+    assert.equal(book().bookings[AUTUMN].name, 'Kari Hansen');
+    assert.notEqual(again.UID, first.UID);
+  });
+
+  test('a week in progress that is handed over is still the whole week in the calendar', async () => {
+    // Someone first in line can get a week that has begun. The event is the week, not what is left of it.
+    await ola.post('/uker/2026-W42/book');
+    await kari.post('/uker/2026-W42/vent');
+    now = new Date('2026-10-15T08:00:00Z');
+    await ola.post('/uker/2026-W42/avbestill');
+
+    const hers = lines(await (await kari.get('/uker/2026-W42/kalender.ics')).text());
+    assert.deepEqual([hers.DTSTART, hers.DTEND], ['20261010T100000Z', '20261017T100000Z']);
+    assert.equal(hers.DTSTAMP, '20261015T080000Z');
+    assert.deepEqual(await offered(kari), ['2026-W42']);
   });
 });
 
