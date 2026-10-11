@@ -8,6 +8,7 @@ import { readFile } from 'node:fs/promises';
 import {
   book, calendar, cancel, describe, drawWinner, enter, markDraw, readName, unmarkDraw, winsOf, withdraw,
 } from './cabin.js';
+import { CALENDAR_TYPE, calendarFile, calendarFileName } from './ics.js';
 import { calendarPage, drawPage, managerPage, messagePage } from './pages.js';
 import { currentWeek, isWeekId } from './weeks.js';
 
@@ -76,10 +77,21 @@ export function createApp({ store, now = () => new Date() }) {
       send(status, drawPage({ ...entry, message }));
     };
 
+    // A booking as a file for the calendar someone keeps themselves. There is no login, so it is
+    // handed to whoever asks, and says no more than the calendar page does: whose week it is.
+    const sendCalendarFile = (week) => {
+      const entry = isWeekId(week) ? describe(store.state, week) : null;
+      if (!entry?.booking) return notFound();
+      send(200, calendarFile(entry), CALENDAR_TYPE, {
+        'Content-Disposition': `attachment; filename="${calendarFileName(week)}"`,
+      });
+    };
+
     if (request.method === 'GET') {
       if (pathname === '/') return showCalendar();
       if (pathname === '/kontorsjef') return showManager();
       if ((match = /^\/trekning\/([^/]+)$/.exec(pathname))) return showDraw(match[1]);
+      if ((match = /^\/uker\/([^/]+)\/kalender\.ics$/.exec(pathname))) return sendCalendarFile(match[1]);
       if (FILES[pathname]) {
         const file = await readFile(new URL(`../public${pathname}`, import.meta.url));
         return send(200, file, FILES[pathname], { 'Cache-Control': 'no-cache' });

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  addWeeks, currentWeek, easterSunday, easterWeek, endOf, formatMoment, formatRange, isWeekId, monthOf, startOf,
-  weekNumber, weeksFrom, yearOf,
+  addWeeks, currentWeek, easterSunday, easterWeek, endOf, endsAt, formatMoment, formatRange, isWeekId, monthOf, startOf,
+  startsAt, weekNumber, weeksFrom, yearOf,
 } from '../src/weeks.js';
 
 const SATURDAY = 6;
@@ -59,6 +59,30 @@ test('twelve is twelve on the clock in Norway, in winter time too', () => {
   // The Saturday the first week of 2027 starts on.
   assert.equal(currentWeek(new Date('2027-01-02T10:59:59Z')), '2026-W53');
   assert.equal(currentWeek(new Date('2027-01-02T11:00:00Z')), '2027-W01');
+});
+
+test('a week starts and ends at twelve in Norway, whatever the clock in Norway is set to', () => {
+  // Summer time on both Saturdays.
+  assert.equal(startsAt('2026-W42').toISOString(), '2026-10-10T10:00:00.000Z');
+  assert.equal(endsAt('2026-W42').toISOString(), '2026-10-17T10:00:00.000Z');
+  // The clock is set back on 25 October 2026, inside this week, which is an hour longer for it.
+  assert.equal(startsAt('2026-W44').toISOString(), '2026-10-24T10:00:00.000Z');
+  assert.equal(endsAt('2026-W44').toISOString(), '2026-10-31T11:00:00.000Z');
+  // And forward on 28 March 2027, the day after Easter week ends.
+  assert.equal(endsAt('2027-W12').toISOString(), '2027-03-27T11:00:00.000Z');
+  assert.equal(endsAt('2027-W13').toISOString(), '2027-04-03T10:00:00.000Z');
+
+  assert.equal(startsAt('2027-W53'), null);
+  assert.equal(endsAt('uke 12'), null);
+});
+
+test('the moment a week starts is the moment it becomes this week', () => {
+  for (const week of weeksFrom('2026-W40', 120)) {
+    const start = startsAt(week).getTime();
+    assert.equal(currentWeek(new Date(start)), week, `${week} at twelve`);
+    assert.equal(currentWeek(new Date(start - 1)), addWeeks(week, -1), `${week} just before twelve`);
+    assert.equal(endsAt(week).getTime(), startsAt(addWeeks(week, 1)).getTime(), `${week} ends as the next starts`);
+  }
 });
 
 test('only weeks that exist are weeks', () => {

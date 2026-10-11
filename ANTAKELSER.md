@@ -85,6 +85,37 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
 21. **Hvor skal siden stå?**
     Antar: i dag på min maskin, for å vise deg. Hvor den skal stå for at alle førti skal nå den, avtaler vi etterpå.
 
+## Bookingen i egen kalender
+
+Du ba om «at folk får bookingen sin inn i kalenderen». Dette er det bygget etter.
+
+22. **Hvilken kalender mener du?**
+    Antar: den hver enkelt har selv, i Outlook, Google Kalender eller på telefonen. Ikke en felles kalender for kontoret, og ikke kalenderen på siden, der bookingen alt står.
+
+23. **Hvilket kalenderprogram bruker dere?**
+    Antar: ett som åpner vanlige kalenderfiler (iCalendar), slik Outlook, Google Kalender og kalenderen på iPhone og Mac gjør. Filen er skrevet etter standarden, men er ikke prøvd i noen av programmene ennå. Si hva dere bruker, så prøver jeg der.
+
+24. **Skal bookingen komme inn av seg selv?**
+    Antar: nei. Den som har en uke, trykker «Legg i kalenderen din» på uka, får en fil og åpner den i kalenderen sin. Siden vet bare hva folk heter, ikke e-postadressen deres, og den sender ikke e-post, så den kan ikke sende en invitasjon.
+
+25. **Hva skal stå i kalenderen?**
+    Antar: én avtale, «Firmahytta, uke 45», fra klokka tolv lørdagen uka starter til klokka tolv lørdagen den slutter. I avtalen står det hvem som har hytta, og at de som reiser, er ute til klokka tolv. At den starter klokka tolv, følger av antakelse 2. Jeg vet ikke hvor hytta ligger, så avtalen har ikke noe sted.
+
+26. **Skal uka stå som opptatt i kalenderen?**
+    Antar: nei, den står som ledig tid. Å ha hytta er ikke det samme som å være borte fra jobb, og en hel uke som opptatt ville stengt for alle møter. Den som tar ferie, legger inn det selv.
+
+27. **Hva skjer i kalenderen når noen sier fra seg uka?**
+    Antar: ingenting. Avtalen er en kopi av bookingen, og siden når ikke inn i kalenderen til folk etterpå. Den blir stående til den som la den inn, sletter den, og det står i avtalen.
+
+28. **Gjelder det også en uke som er vunnet i en trekning?**
+    Antar: ja. Vinneren finner samme lenke på uka si.
+
+29. **Hvem kan hente filen?**
+    Antar: lenken vises bare for den som har uka. Uten innlogging svarer adressen likevel alle som kjenner den. Filen sier ikke mer enn kalenderen på siden: hvem som har hytta den uka.
+
+30. **Skal kalenderen kunne følge med på hytta selv, eller minne folk på uka?**
+    Antar: nei. Et abonnement, der kalenderen henter endringer selv, krever at siden står et sted kalenderen når den (se 21). Avtalen har ingen påminnelse ut over den kalenderen til hver enkelt selv legger på.
+
 ## Ikke med i første versjon
 
 Du har ikke bedt om dette, så det er ikke bygget: innlogging, varsel på e-post, venteliste på vanlige uker, regler for hvem som fikk hva i fjor, historikk over tidligere trekninger, og priser eller betaling.

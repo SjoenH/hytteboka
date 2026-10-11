@@ -196,8 +196,8 @@ describe('the Saturday one group leaves and the next arrives', () => {
     now = MORNING;
 
     assert.equal(await card(kari, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Booket av Ola Nordmann');
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Du har hytta Si fra deg uka');
-    assert.equal(await card(ola, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Du har hytta Si fra deg uka');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Du har hytta Si fra deg uka Legg i kalenderen din');
+    assert.equal(await card(ola, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Du har hytta Si fra deg uka Legg i kalenderen din');
     assert.equal(await card(ola, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Booket av Kari Hansen');
   });
 
@@ -207,7 +207,7 @@ describe('the Saturday one group leaves and the next arrives', () => {
 
     assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Ledig Book uka');
     assert.equal((await kari.post(`/uker/${ARRIVING}/book`)).status, 303);
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Du har hytta Si fra deg uka');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Du har hytta Si fra deg uka Legg i kalenderen din');
   });
 
   test('after twelve the week of those who left is gone, and this week belongs to those who arrived', async () => {
@@ -216,7 +216,7 @@ describe('the Saturday one group leaves and the next arrives', () => {
     now = AFTERNOON;
 
     assert.doesNotMatch(await (await kari.get('/')).text(), new RegExp(`id="${LEAVING}"`));
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Du har hytta Si fra deg uka');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Du har hytta Si fra deg uka Legg i kalenderen din');
     assert.equal(await card(ola, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Booket av Kari Hansen');
   });
 
@@ -255,7 +255,7 @@ describe('booking', () => {
     assert.equal(response.status, 303);
     assert.equal(response.headers.get('location'), `/#${AUTUMN}`);
 
-    assert.equal(await card(ola, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Du har hytta Si fra deg uka');
+    assert.equal(await card(ola, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Du har hytta Si fra deg uka Legg i kalenderen din');
     assert.equal(await card(kari, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Booket av Ola Nordmann');
     assert.equal(await card(visitor, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Booket av Ola Nordmann');
     assert.equal(book().bookings[AUTUMN].name, 'Ola Nordmann');
@@ -351,7 +351,7 @@ describe('the draw', () => {
     assert.equal(book().bookings[EASTER].name, winner);
 
     assert.match(await card(visitor, EASTER), new RegExp(`${winner} vant trekningen Se trekningen$`));
-    assert.match(await card(person(winner), EASTER), /Du vant trekningen Si fra deg uka Se trekningen$/);
+    assert.match(await card(person(winner), EASTER), /Du vant trekningen Si fra deg uka Legg i kalenderen din Se trekningen$/);
 
     const page = await (await visitor.get(`/trekning/${EASTER}`)).text();
     assert.match(page, new RegExp(`<p class="winner-name" data-winner-name>${winner}</p>`));
@@ -520,6 +520,126 @@ describe('for the office manager', () => {
     assert.match(await entered.text(), /1 har meldt seg på trekningen om uke 12/);
 
     assert.equal((await visitor.post('/kontorsjef/trekningsuker', {})).status, 404);
+  });
+});
+
+// Ragnhild asked that people get their booking into their calendar: the one they keep themselves,
+// in Outlook or on the phone. Whoever has a week is handed it as a file such a calendar reads.
+describe('the booking in your own calendar', () => {
+  const FILE = `/uker/${AUTUMN}/kalender.ics`;
+  const link = (week) => new RegExp(`<a href="/uker/${week}/kalender\\.ics">Legg i kalenderen din</a>`);
+  /** The lines of a calendar file, by name, with lines that were broken put together again. */
+  const lines = (file) =>
+    Object.fromEntries(file.replace(/\r\n /g, '').split('\r\n').map((line) => line.split(/:(.*)/s).slice(0, 2)));
+
+  test('Ola books a week and finds the way to his calendar on it; nobody else is offered it', async () => {
+    assert.doesNotMatch(await (await ola.get('/')).text(), /kalender\.ics/, 'nothing to fetch before he has a week');
+    await ola.post(`/uker/${AUTUMN}/book`);
+
+    assert.equal(await card(ola, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Du har hytta Si fra deg uka Legg i kalenderen din');
+    const page = await (await ola.get('/')).text();
+    assert.match(page, link(AUTUMN));
+    assert.equal(page.match(/kalender\.ics/g).length, 1, 'only on the week that is his');
+
+    assert.doesNotMatch(await (await kari.get('/')).text(), /kalender\.ics/);
+    assert.doesNotMatch(await (await visitor.get('/')).text(), /kalender\.ics/);
+  });
+
+  test('what he fetches is a calendar file, named after the week, that the browser saves', async () => {
+    await ola.post(`/uker/${AUTUMN}/book`);
+    const response = await ola.get(FILE);
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('content-type'), 'text/calendar; charset=utf-8');
+    assert.equal(response.headers.get('content-disposition'), 'attachment; filename="hytta-2026-uke-45.ics"');
+    assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
+    const file = await response.text();
+    assert.ok(file.startsWith('BEGIN:VCALENDAR\r\n'));
+    assert.ok(file.endsWith('END:VCALENDAR\r\n'));
+  });
+
+  test('the event in it is his week: from twelve on Saturday 31 October to twelve on Saturday 7 November', async () => {
+    await ola.post(`/uker/${AUTUMN}/book`);
+    const event = lines(await (await ola.get(FILE)).text());
+
+    // Winter time: twelve in Norway is 11:00 UTC.
+    assert.equal(event.DTSTART, '20261031T110000Z');
+    assert.equal(event.DTEND, '20261107T110000Z');
+    assert.equal(event.SUMMARY, 'Firmahytta\\, uke 45');
+    assert.match(event.DESCRIPTION, /^Ola Nordmann har firmahytta denne uka\./);
+    assert.match(event.DESCRIPTION, /De som reiser\\, er ute til klokka 12\./);
+    assert.equal(event.DTSTAMP, '20261014T100000Z', 'when he booked');
+  });
+
+  test('fetching it again gives the same event, so a calendar that has it need not get it twice', async () => {
+    await ola.post(`/uker/${AUTUMN}/book`);
+    const first = await (await ola.get(FILE)).text();
+    assert.ok(first.startsWith('BEGIN:VCALENDAR\r\n'));
+    now = new Date('2026-10-20T07:00:00Z');
+    assert.equal(await (await ola.get(FILE)).text(), first);
+  });
+
+  test('the week someone won in a draw goes in their calendar the same way', async () => {
+    await ola.post(`/uker/${EASTER}/meld-pa`);
+    assert.doesNotMatch(await (await ola.get('/')).text(), /kalender\.ics/, 'entering a draw is not having the week');
+    assert.equal((await ola.get(`/uker/${EASTER}/kalender.ics`)).status, 404);
+
+    await visitor.post(`/trekning/${EASTER}/trekk`, { klar: 'ja' });
+    assert.match(await card(ola, EASTER), /Du vant trekningen Si fra deg uka Legg i kalenderen din Se trekningen$/);
+    assert.match(await (await ola.get('/')).text(), link(EASTER));
+
+    // The clock is set forward on 28 March 2027, the day after: both Saturdays are in winter time.
+    const event = lines(await (await ola.get(`/uker/${EASTER}/kalender.ics`)).text());
+    assert.equal(event.DTSTART, '20270320T110000Z');
+    assert.equal(event.DTEND, '20270327T110000Z');
+    assert.equal(event.SUMMARY, 'Firmahytta\\, uke 12');
+  });
+
+  test('a week Ola gives up has no file any more, and is another event when Kari books it', async () => {
+    await ola.post(`/uker/${AUTUMN}/book`);
+    const his = lines(await (await ola.get(FILE)).text());
+    await ola.post(`/uker/${AUTUMN}/avbestill`);
+
+    assert.equal((await ola.get(FILE)).status, 404);
+    assert.doesNotMatch(await (await ola.get('/')).text(), /kalender\.ics/);
+
+    await kari.post(`/uker/${AUTUMN}/book`);
+    const hers = lines(await (await kari.get(FILE)).text());
+    assert.notEqual(hers.UID, his.UID);
+    assert.match(hers.DESCRIPTION, /^Kari Hansen har firmahytta denne uka\./);
+    assert.doesNotMatch(await (await ola.get('/')).text(), /kalender\.ics/, 'the week is hers now');
+  });
+
+  test('the file says whose week it is to whoever fetches it, as the calendar page does', async () => {
+    // There is no login, so the address answers anyone. Only the one who has the week is shown it.
+    await ola.post(`/uker/${AUTUMN}/book`);
+    const event = lines(await (await visitor.get(FILE)).text());
+    assert.match(event.DESCRIPTION, /^Ola Nordmann har firmahytta denne uka\./);
+  });
+
+  test('there is no file for a free week, a week that does not exist, or anything else under a week', async () => {
+    for (const path of [FILE, '/uker/2027-W53/kalender.ics', '/uker/tull/kalender.ics', `/uker/${AUTUMN}/kalender`, `/uker/${AUTUMN}`]) {
+      const response = await ola.get(path);
+      assert.equal(response.status, 404, path);
+      assert.match(response.headers.get('content-type'), /text\/html/, path);
+    }
+  });
+
+  test('fetching the file changes nothing in the book, and cannot be done with a post', async () => {
+    await ola.post(`/uker/${AUTUMN}/book`);
+    const before = readFileSync(file, 'utf8');
+    assert.equal((await ola.get(FILE)).status, 200);
+    assert.equal((await ola.post(FILE)).status, 404);
+    assert.equal(readFileSync(file, 'utf8'), before);
+  });
+
+  test('a name with signs the calendar format uses for itself is still read as one name', async () => {
+    const rascal = person('Hansen, Kari; \\n END:VEVENT');
+    await rascal.post(`/uker/${AUTUMN}/book`);
+    const text = await (await rascal.get(FILE)).text();
+
+    assert.equal(text.match(/^END:VEVENT\r$/gm).length, 1);
+    assert.match(lines(text).DESCRIPTION, /^Hansen\\, Kari\\; \\\\n END:VEVENT har firmahytta denne uka\./);
   });
 });
 
