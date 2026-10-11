@@ -164,6 +164,91 @@ describe('the cabin week', () => {
   });
 });
 
+// Ragnhild wrote that the page says the cabin is taken when one group leaves on a Saturday and
+// the next arrives the same Saturday. These go through that Saturday: 17 October 2026, when
+// Ola's week (10 to 17 October) ends and Kari's (17 to 24 October) starts.
+describe('the Saturday one group leaves and the next arrives', () => {
+  const LEAVING = '2026-W42';
+  const ARRIVING = '2026-W43';
+  const MORNING = new Date('2026-10-17T08:30:00Z'); // 10:30 in Norway, before those who leave are out
+  const AFTERNOON = new Date('2026-10-17T13:00:00Z'); // 15:00 in Norway
+
+  test('the week that starts that Saturday is free and can be booked, though the week that ends then is taken', async () => {
+    await ola.post(`/uker/${LEAVING}/book`);
+
+    assert.equal(await card(kari, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Booket av Ola Nordmann');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Ledig Book uka');
+
+    assert.equal((await kari.post(`/uker/${ARRIVING}/book`)).status, 303);
+    assert.equal(book().bookings[LEAVING].name, 'Ola Nordmann');
+    assert.equal(book().bookings[ARRIVING].name, 'Kari Hansen');
+  });
+
+  test('it makes no difference which of the two weeks is booked first', async () => {
+    assert.equal((await kari.post(`/uker/${ARRIVING}/book`)).status, 303);
+    assert.equal((await ola.post(`/uker/${LEAVING}/book`)).status, 303);
+    assert.deepEqual(Object.keys(book().bookings).sort(), [LEAVING, ARRIVING]);
+  });
+
+  test('on the Saturday morning the page shows both: those who leave have this week, those who arrive the next', async () => {
+    await ola.post(`/uker/${LEAVING}/book`);
+    await kari.post(`/uker/${ARRIVING}/book`);
+    now = MORNING;
+
+    assert.equal(await card(kari, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Booket av Ola Nordmann');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Du har hytta Si fra deg uka');
+    assert.equal(await card(ola, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Du har hytta Si fra deg uka');
+    assert.equal(await card(ola, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Booket av Kari Hansen');
+  });
+
+  test('on the Saturday morning itself, the week that starts that day can still be booked', async () => {
+    await ola.post(`/uker/${LEAVING}/book`);
+    now = MORNING;
+
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Ledig Book uka');
+    assert.equal((await kari.post(`/uker/${ARRIVING}/book`)).status, 303);
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Du har hytta Si fra deg uka');
+  });
+
+  test('after twelve the week of those who left is gone, and this week belongs to those who arrived', async () => {
+    await ola.post(`/uker/${LEAVING}/book`);
+    await kari.post(`/uker/${ARRIVING}/book`);
+    now = AFTERNOON;
+
+    assert.doesNotMatch(await (await kari.get('/')).text(), new RegExp(`id="${LEAVING}"`));
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Du har hytta Si fra deg uka');
+    assert.equal(await card(ola, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Booket av Kari Hansen');
+  });
+
+  test('after twelve the week that started that day is free for whoever comes, if nobody had booked it', async () => {
+    await ola.post(`/uker/${LEAVING}/book`);
+    now = AFTERNOON;
+
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Ledig Book uka');
+    assert.equal((await kari.post(`/uker/${ARRIVING}/book`)).status, 303);
+  });
+
+  test('the weeks on both sides of a week that was drawn can be booked', async () => {
+    // The winter break, 20 to 27 February 2027, shares a Saturday with the week before and the week after.
+    for (const who of [ola, kari, per]) await who.post('/uker/2027-W08/meld-pa');
+    await visitor.post('/trekning/2027-W08/trekk', { klar: 'ja' });
+    const winner = book().bookings['2027-W08'].name;
+
+    assert.equal((await person('Nina Berg').post('/uker/2027-W07/book')).status, 303);
+    assert.equal((await person('Jonas Lie').post('/uker/2027-W09/book')).status, 303);
+    assert.equal(book().bookings['2027-W08'].name, winner);
+  });
+
+  test('a winner can be drawn for a week whose neighbours are both taken', async () => {
+    await person('Nina Berg').post('/uker/2027-W07/book');
+    await person('Jonas Lie').post('/uker/2027-W09/book');
+    await ola.post('/uker/2027-W08/meld-pa');
+
+    assert.equal((await visitor.post('/trekning/2027-W08/trekk', { klar: 'ja' })).status, 303);
+    assert.equal(book().bookings['2027-W08'].name, 'Ola Nordmann');
+  });
+});
+
 describe('booking', () => {
   test('Ola books a free week, and everyone sees that it is his', async () => {
     const response = await ola.post(`/uker/${AUTUMN}/book`);
