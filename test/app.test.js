@@ -82,10 +82,10 @@ describe('the calendar', () => {
 
     assert.equal(response.status, 200);
     assert.match(response.headers.get('content-type'), /text\/html/);
-    assert.equal(page.match(/<li class="week /g).length, 52);
+    assert.equal(page.match(/<li class="week /g).length, 51, 'Easter’s two weeks are one card');
     assert.match(page, /<h2>Oktober 2026<\/h2>/);
     assert.match(await card(visitor, '2026-W42'), /^Uke 42 fre\. 9\. – fre\. 16\. oktober Denne uka Ledig$/);
-    assert.match(await card(visitor, EASTER), /Uke 12 fre\. 19\. – fre\. 26\. mars Trekning · Påske Ingen påmeldt ennå Se trekningen/);
+    assert.match(await card(visitor, EASTER), /Uke 12 og 13 fre\. 19\. mars – fre\. 2\. april Trekning · Påske Ingen påmeldt ennå Se trekningen/);
     assert.match(await card(visitor, '2027-W08'), /Trekning · Vinterferie/);
   });
 
@@ -147,7 +147,7 @@ describe('the cabin week', () => {
     now = TWELVE;
     const page = await (await visitor.get('/')).text();
     assert.doesNotMatch(page, /id="2026-W42"/);
-    assert.equal(page.match(/<li class="week /g).length, 52);
+    assert.equal(page.match(/<li class="week /g).length, 51, 'Easter’s two weeks are one card');
     assert.match(await card(visitor, '2026-W43'), /^Uke 43 fre\. 16\. – fre\. 23\. oktober Denne uka Ledig$/);
 
     const late = await ola.post('/uker/2026-W42/book');
@@ -300,7 +300,7 @@ describe('booking', () => {
   test('a week a winner is drawn for cannot be booked', async () => {
     const response = await ola.post(`/uker/${EASTER}/book`);
     assert.equal(response.status, 409);
-    assert.match(await response.text(), /Det trekkes lodd om uke 12\. Meld deg på trekningen i stedet\./);
+    assert.match(await response.text(), /Det trekkes lodd om uke 12 og 13\. Meld deg på trekningen i stedet\./);
   });
 });
 
@@ -438,7 +438,7 @@ describe('the waiting list', () => {
 
     const draw = await kari.post(`/uker/${EASTER}/vent`);
     assert.equal(draw.status, 409);
-    assert.match(await draw.text(), /role="alert">Det trekkes lodd om uke 12\. Meld deg på trekningen i stedet\./);
+    assert.match(await draw.text(), /role="alert">Det trekkes lodd om uke 12 og 13\. Meld deg på trekningen i stedet\./);
 
     const nameless = await visitor.post(`/uker/${AUTUMN}/vent`);
     assert.equal(nameless.status, 400);
@@ -477,12 +477,12 @@ describe('the waiting list', () => {
     await nina.post(`/uker/${EASTER}/meld-pa`);
     await visitor.post(`/trekning/${EASTER}/trekk`, { klar: 'ja' });
 
-    assert.equal(await card(kari, EASTER), 'Uke 12 fre. 19. – fre. 26. mars Trekning · Påske Nina Berg vant trekningen Se trekningen');
+    assert.equal(await card(kari, EASTER), 'Uke 12 og 13 fre. 19. mars – fre. 2. april Trekning · Påske Nina Berg vant trekningen Se trekningen');
     const response = await kari.post(`/uker/${EASTER}/vent`);
     assert.equal(response.status, 409);
     assert.match(
       await response.text(),
-      /role="alert">Det er trukket lodd om uke 12\. Sier Nina Berg den fra seg, trekkes det på nytt blant de andre som var påmeldt\./,
+      /role="alert">Det er trukket lodd om uke 12 og 13\. Sier Nina Berg den fra seg, trekkes det på nytt blant de andre som var påmeldt\./,
     );
   });
 
@@ -550,7 +550,7 @@ describe('the draw', () => {
 
     assert.equal(response.status, 200);
     assert.match(page, /<h1>Påske<\/h1>/);
-    assert.match(page, /Uke 12 · fre\. 19\. – fre\. 26\. mars 2027/);
+    assert.match(page, /Uke 12 og 13 · fre\. 19\. mars – fre\. 2\. april 2027/);
     assert.deepEqual(
       [...page.matchAll(/<li class="ticket" data-ticket>([^<]*)<\/li>/g)].map((found) => found[1]),
       ['Ola Nordmann', 'Kari Hansen', 'Per Olsen'],
@@ -573,7 +573,7 @@ describe('the draw', () => {
     assert.equal(book().bookings[EASTER].name, winner);
 
     assert.match(await card(visitor, EASTER), new RegExp(`${winner} vant trekningen Se trekningen$`));
-    assert.match(await card(person(winner), EASTER), /Du vant trekningen! Si fra deg uka Legg i kalenderen din Se trekningen$/);
+    assert.match(await card(person(winner), EASTER), /Du vant trekningen! Si fra deg turen Legg i kalenderen din Se trekningen$/);
 
     const page = await (await visitor.get(`/trekning/${EASTER}`)).text();
     assert.match(page, new RegExp(`<p class="winner-name" data-winner-name>${winner}</p>`));
@@ -583,7 +583,7 @@ describe('the draw', () => {
 
     const again = await draw();
     assert.equal(again.status, 409);
-    assert.match((await again.json()).message, new RegExp(`Trekningen om uke 12 er gjort\\. Uka gikk til ${winner}\\.`));
+    assert.match((await again.json()).message, new RegExp(`Trekningen om uke 12 og 13 er gjort\\. Turen gikk til ${winner}\\.`));
     assert.equal(book().bookings[EASTER].name, winner);
     assert.equal((await person('Nina Berg').post(`/uker/${EASTER}/meld-pa`)).status, 409);
   });
@@ -671,7 +671,7 @@ describe('nobody wins two weeks in the same year', () => {
 
     assert.equal(
       await card(winner, EASTER),
-      'Uke 12 fre. 19. – fre. 26. mars Trekning · Påske 2 påmeldte Du vant uke 8, og kan ikke vinne en uke til i 2027 Se trekningen',
+      'Uke 12 og 13 fre. 19. mars – fre. 2. april Trekning · Påske 2 påmeldte Du vant uke 8, og kan ikke vinne en uke til i 2027 Se trekningen',
     );
     const again = await winner.post(`/uker/${EASTER}/meld-pa`);
     assert.equal(again.status, 409);
@@ -712,7 +712,7 @@ describe('for the office manager', () => {
     await kari.post(`/uker/${EASTER}/meld-pa`);
     const page = await (await visitor.get('/kontorsjef')).text();
 
-    assert.match(page, /<strong>Påske<\/strong>\s*<span>Uke 12 · fre\. 19\. – fre\. 26\. mars 2027<\/span>/);
+    assert.match(page, /<strong>Påske<\/strong>\s*<span>Uke 12 og 13 · fre\. 19\. mars – fre\. 2\. april 2027<\/span>/);
     assert.match(page, /2 påmeldte: <span class="person">Ola Nordmann, Kari Hansen<\/span>/);
     assert.match(page, new RegExp(`href="/trekning/${EASTER}">Åpne trekningen`));
     assert.match(page, /<option value="2026-W45">Uke 45 · fre\. 30\. oktober – fre\. 6\. november 2026<\/option>/);
@@ -739,7 +739,7 @@ describe('for the office manager', () => {
     await kari.post(`/uker/${EASTER}/meld-pa`);
     const entered = await visitor.post(`/kontorsjef/trekningsuker/${EASTER}/fjern`);
     assert.equal(entered.status, 409);
-    assert.match(await entered.text(), /1 har meldt seg på trekningen om uke 12/);
+    assert.match(await entered.text(), /1 har meldt seg på trekningen om uke 12 og 13/);
 
     assert.equal((await visitor.post('/kontorsjef/trekningsuker', {})).status, 404);
   });
@@ -807,14 +807,15 @@ describe('the booking in your own calendar', () => {
     assert.equal((await ola.get(`/uker/${EASTER}/kalender.ics`)).status, 404);
 
     await visitor.post(`/trekning/${EASTER}/trekk`, { klar: 'ja' });
-    assert.match(await card(ola, EASTER), /Du vant trekningen! Si fra deg uka Legg i kalenderen din Se trekningen$/);
+    assert.match(await card(ola, EASTER), /Du vant trekningen! Si fra deg turen Legg i kalenderen din Se trekningen$/);
     assert.match(await (await ola.get('/')).text(), link(EASTER));
 
-    // The clock is set forward on 28 March 2027, two days after: both Fridays are in winter time.
+    // Easter is one trip of two weeks, and one event. The clock is set forward on 28 March 2027,
+    // inside it: it starts in winter time and ends in summer time.
     const event = lines(await (await ola.get(`/uker/${EASTER}/kalender.ics`)).text());
-    assert.equal(event.DTSTART, '20270319T150000Z');
-    assert.equal(event.DTEND, '20270326T110000Z');
-    assert.equal(event.SUMMARY, 'Firmahytta\\, uke 12');
+    assert.equal(event.DTSTART, '20270319T150000Z', 'four in the afternoon on Friday 19 March');
+    assert.equal(event.DTEND, '20270402T100000Z', 'twelve on Friday 2 April');
+    assert.equal(event.SUMMARY, 'Firmahytta\\, uke 12 og 13');
   });
 
   test('a week Ola gives up with nobody waiting has no file any more, and is another event when Kari books it', async () => {
@@ -980,6 +981,211 @@ describe('a week from the waiting list, in your own calendar', () => {
     assert.deepEqual([hers.DTSTART, hers.DTEND], ['20261009T140000Z', '20261016T100000Z']);
     assert.equal(hers.DTSTAMP, '20261015T080000Z');
     assert.deepEqual(await offered(kari), ['2026-W42']);
+  });
+});
+
+// Ragnhild's rule: Easter is one trip, from the Friday before Palm Sunday to the Friday after Easter
+// Monday, and one winner has all of it, since nobody goes to the mountains for half an Easter.
+// In 2027 that is week 12 and week 13: Friday 19 March to Friday 2 April.
+describe('Easter is one trip', () => {
+  const SECOND = '2027-W13';
+  const TRIP = 'Uke 12 og 13 fre. 19. mars – fre. 2. april Trekning · Påske';
+  const NAMES = ['Ola Nordmann', 'Kari Hansen', 'Per Olsen'];
+  const enterAll = async () => {
+    for (const name of NAMES) assert.equal((await person(name).post(`/uker/${EASTER}/meld-pa`)).status, 303);
+  };
+  /** Draws Easter and answers with whoever won, and the first of those who did not. */
+  const drawEaster = async (week = EASTER) => {
+    const response = await visitor.post(`/trekning/${week}/trekk`, { klar: 'ja' }, { Accept: 'application/json' });
+    const drawn = await response.json();
+    const name = drawn.entries[drawn.winner];
+    return { name, browser: person(name), another: person(drawn.entries.find((each) => each !== name) ?? 'Nina Berg') };
+  };
+  const lines = (text) =>
+    Object.fromEntries(text.replace(/\r\n /g, '').split('\r\n').map((line) => line.split(/:(.*)/s).slice(0, 2)));
+  const hasCard = async (who, week) => (await (await who.get('/')).text()).includes(`id="${week}"`);
+
+  test('the calendar shows it as one card with its two Fridays, and no card for its second week', async () => {
+    assert.equal(await card(kari, EASTER), `${TRIP} Ingen påmeldt ennå Meld meg på Se trekningen`);
+    assert.equal(await hasCard(kari, SECOND), false);
+    assert.match(await card(kari, '2027-W11'), /^Uke 11 fre\. 12\. – fre\. 19\. mars Ledig/);
+    assert.match(await card(kari, '2027-W14'), /^Uke 14 fre\. 2\. – fre\. 9\. april Ledig/);
+  });
+
+  test('the draw page shows the trip, by whichever of its weeks it is asked for', async () => {
+    await enterAll();
+    for (const week of [EASTER, SECOND]) {
+      const response = await visitor.get(`/trekning/${week}`);
+      const page = await response.text();
+      assert.equal(response.status, 200, week);
+      assert.match(page, /<h1>Påske<\/h1>/);
+      assert.match(page, /<p class="draw-when">Uke 12 og 13 · fre\. 19\. mars – fre\. 2\. april 2027<\/p>/);
+      assert.match(page, /3 lodd i hatten/);
+      assert.ok(page.includes(`action="/trekning/${EASTER}/trekk"`), 'and its button draws the trip');
+    }
+  });
+
+  test('the manager’s page lists it as one trip, and does not offer its second week for a draw of its own', async () => {
+    const page = await (await visitor.get('/kontorsjef')).text();
+
+    assert.match(page, /<strong>Påske<\/strong>\s*<span>Uke 12 og 13 · fre\. 19\. mars – fre\. 2\. april 2027<\/span>/);
+    assert.ok(!page.includes(`<option value="${EASTER}">`));
+    assert.ok(!page.includes(`<option value="${SECOND}">`));
+    assert.match(page, /<option value="2027-W14">Uke 14 · fre\. 2\. – fre\. 9\. april 2027<\/option>/);
+
+    const own = await visitor.post('/kontorsjef/trekningsuker', { uke: SECOND, navn: 'Påskehelga' });
+    assert.equal(own.status, 409);
+    assert.match(await own.text(), /role="alert">Det trekkes allerede lodd om uke 12 og 13\./);
+  });
+
+  test('people enter the trip, and its second week cannot be booked or waited for', async () => {
+    assert.equal((await ola.post(`/uker/${SECOND}/meld-pa`)).status, 303, 'by its second week too');
+    assert.equal(await card(ola, EASTER), `${TRIP} 1 påmeldt Du er med i trekningen Meld meg av Se trekningen`);
+
+    const booked = await kari.post(`/uker/${SECOND}/book`);
+    assert.equal(booked.status, 409);
+    assert.match(await booked.text(), /role="alert">Det trekkes lodd om uke 12 og 13\. Meld deg på trekningen i stedet\./);
+    assert.equal((await kari.post(`/uker/${SECOND}/vent`)).status, 409);
+    assert.deepEqual(book().bookings, {});
+  });
+
+  test('drawing it gives one person both weeks', async () => {
+    await enterAll();
+    const winner = await drawEaster();
+
+    assert.deepEqual(book().bookings, { [EASTER]: { name: winner.name, at: NOW.toISOString() } }, 'one booking, on the first week');
+    assert.equal(await card(winner.browser, EASTER), `${TRIP} Du vant trekningen! Si fra deg turen Legg i kalenderen din Se trekningen`);
+    assert.equal(await card(winner.another, EASTER), `${TRIP} ${winner.name} vant trekningen Se trekningen`);
+
+    for (const week of [EASTER, SECOND]) {
+      const taken = await winner.another.post(`/uker/${week}/book`);
+      assert.equal(taken.status, 409, week);
+      assert.ok((await taken.text()).includes(`Det er trukket lodd om uke 12 og 13, og den gikk til ${winner.name}.`), week);
+    }
+    const page = await (await visitor.get(`/trekning/${SECOND}`)).text();
+    assert.ok(page.includes(`<p class="winner-name" data-winner-name>${winner.name}</p>`));
+    assert.match(page, /Uke 12 og 13 · fre\. 19\. mars – fre\. 2\. april 2027/);
+  });
+
+  test('the winner’s calendar file is one event for the whole trip, by either week’s address', async () => {
+    await enterAll();
+    const winner = await drawEaster(SECOND);
+
+    for (const week of [EASTER, SECOND]) {
+      const response = await winner.browser.get(`/uker/${week}/kalender.ics`);
+      const event = lines(await response.text());
+      assert.equal(response.headers.get('content-disposition'), 'attachment; filename="hytta-2027-uke-12.ics"', week);
+      assert.equal(event.DTSTART, '20270319T150000Z', 'after work on Friday 19 March');
+      assert.equal(event.DTEND, '20270402T100000Z', 'out at twelve on Friday 2 April, with no changeover on Good Friday');
+      assert.equal(event.SUMMARY, 'Firmahytta\\, uke 12 og 13');
+      assert.ok(event.DESCRIPTION.startsWith(`${winner.name} har firmahytta begge ukene.`));
+    }
+  });
+
+  test('the winner gives the trip up whole, and it is drawn again among the others', async () => {
+    await enterAll();
+    const first = await drawEaster();
+    assert.equal((await first.browser.post(`/uker/${SECOND}/avbestill`)).status, 303, 'by its second week');
+
+    assert.deepEqual(book().bookings, {});
+    assert.equal(book().draws[EASTER].entries.length, 2);
+    assert.equal(await card(first.browser, EASTER), `${TRIP} 2 påmeldte Meld meg på Se trekningen`);
+    assert.equal(await hasCard(first.browser, SECOND), false, 'no half of it is left free');
+
+    const second = await drawEaster();
+    assert.notEqual(second.name, first.name);
+  });
+
+  test('whoever wins Easter cannot win the winter break the same year', async () => {
+    await enterAll();
+    for (const name of NAMES) await person(name).post('/uker/2027-W08/meld-pa');
+    const winner = await drawEaster();
+
+    assert.match(await card(winner.browser, '2027-W08'), /2 påmeldte Du vant uke 12 og 13, og kan ikke vinne en uke til i 2027 Se trekningen$/);
+    const again = await winner.browser.post('/uker/2027-W08/meld-pa');
+    assert.equal(again.status, 409);
+    assert.match(await again.text(), /role="alert">Du vant uke 12 og 13, og kan ikke vinne en uke til i 2027\./);
+  });
+
+  test('on Good Friday the winner stays: the trip is this week through both its weeks', async () => {
+    await enterAll();
+    const winner = await drawEaster();
+
+    // Good Friday 2027 at twelve in Norway, when a week ends: 26 March, 11:00 UTC.
+    now = new Date('2027-03-26T11:00:00Z');
+    assert.equal(
+      await card(winner.browser, EASTER),
+      'Uke 12 og 13 fre. 19. mars – fre. 2. april Denne uka Trekning · Påske Du vant trekningen! Si fra deg turen Legg i kalenderen din Se trekningen',
+    );
+    const page = await (await visitor.get('/')).text();
+    assert.ok(page.indexOf(`id="${EASTER}"`) < page.indexOf('id="2027-W14"'), 'and it is the first card');
+    assert.equal(page.indexOf('<li class="week '), page.indexOf(`<li class="week week--drawn" id="${EASTER}"`));
+
+    // The Friday after Easter Monday at twelve: 2 April, 10:00 UTC, in summer time.
+    now = new Date('2027-04-02T10:00:00Z');
+    assert.equal(await hasCard(visitor, EASTER), false);
+    assert.match(await card(visitor, '2027-W14'), /^Uke 14 fre\. 2\. – fre\. 9\. april Denne uka Ledig$/);
+  });
+
+  describe('in a book written before Easter was one trip', () => {
+    // The book as the copy that is running had it: no waiting lists, and Easter as one week with people entered.
+    const ENTERED = ['Kari Nordmann', 'Per Hansen', 'Anne Olsen', 'Lars Berg', 'Mona Lie'];
+    const OLDER = {
+      bookings: {
+        '2026-W43': { name: 'Ingrid Dahl', at: '2026-10-11T16:12:06.615Z' },
+        '2026-W45': { name: 'Erik Moen', at: '2026-10-11T16:12:06.683Z' },
+      },
+      draws: {
+        '2027-W08': { label: 'Vinterferie', entries: [{ name: 'Ola Nordmann', at: '2026-10-11T16:12:06.700Z' }] },
+        '2027-W12': { label: 'Påske', entries: ENTERED.map((name, index) => ({ name, at: `2026-10-11T16:12:07.${index}00Z` })) },
+      },
+    };
+    const openOlder = (older = OLDER) => {
+      const written = `${JSON.stringify(older, null, 2)}\n`;
+      writeFileSync(file, written);
+      server.app = createApp({ store: openStore(file, () => assert.fail('the book is there')), now: () => now });
+      return written;
+    };
+
+    test('it still reads, and reading it changes nothing in the file', async () => {
+      const written = openOlder();
+      for (const path of ['/', '/kontorsjef', `/trekning/${EASTER}`, `/trekning/${SECOND}`]) {
+        assert.equal((await visitor.get(path)).status, 200, path);
+      }
+      assert.equal(readFileSync(file, 'utf8'), written);
+    });
+
+    test('those who had entered are in the draw for the whole trip', async () => {
+      openOlder();
+      const kariNordmann = person('Kari Nordmann');
+
+      assert.equal(await card(kariNordmann, EASTER), `${TRIP} 5 påmeldte Du er med i trekningen Meld meg av Se trekningen`);
+      assert.equal(await hasCard(kariNordmann, SECOND), false);
+      const page = await (await visitor.get(`/trekning/${EASTER}`)).text();
+      assert.deepEqual([...page.matchAll(/data-ticket>([^<]*)</g)].map((found) => found[1]), ENTERED);
+      assert.match(page, /Uke 12 og 13 · fre\. 19\. mars – fre\. 2\. april 2027/);
+    });
+
+    test('the draw gives one of them both weeks', async () => {
+      openOlder();
+      const winner = await drawEaster();
+
+      assert.ok(ENTERED.includes(winner.name));
+      assert.deepEqual(Object.keys(book().bookings).sort(), ['2026-W43', '2026-W45', EASTER]);
+      assert.equal((await person('Nina Berg').post(`/uker/${SECOND}/book`)).status, 409);
+      assert.equal(lines(await (await winner.browser.get(`/uker/${SECOND}/kalender.ics`)).text()).DTEND, '20270402T100000Z');
+    });
+
+    test('someone who had booked the second week keeps it, and Easter is then the one week it was', async () => {
+      openOlder({ ...OLDER, bookings: { ...OLDER.bookings, [SECOND]: { name: 'Nina Berg', at: '2026-10-11T16:13:00.000Z' } } });
+
+      assert.equal(await card(visitor, EASTER), 'Uke 12 fre. 19. – fre. 26. mars Trekning · Påske 5 påmeldte Se trekningen');
+      assert.equal(await card(visitor, SECOND), 'Uke 13 fre. 26. mars – fre. 2. april Booket av Nina Berg');
+
+      assert.equal((await person('Nina Berg').post(`/uker/${SECOND}/avbestill`)).status, 303);
+      assert.equal(await card(visitor, EASTER), `${TRIP} 5 påmeldte Se trekningen`, 'given up, it is part of the trip');
+      assert.equal(await hasCard(visitor, SECOND), false);
+    });
   });
 });
 

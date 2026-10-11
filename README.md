@@ -18,7 +18,7 @@ Rammene var at den skal kjøre på egen maskin med én kommando, uten sky og ute
 
 ## Slik ble den
 
-Kunden rettet og la til underveis. Hytteuka går fra fredag til fredag, og de som reiser, er ute til klokka tolv. Ingen vinner to trekninger samme år, en uke som er tatt har venteliste, og den som har en uke, kan legge den i kalenderen sin. Fredagsoversikten over hvem som har hytta, lages med `/oversikt` i Claude Code.
+Kunden rettet og la til underveis. Hytteuka går fra fredag til fredag, og de som reiser, er ute til klokka tolv. Påsken trekkes som én tur på to uker. Ingen vinner to trekninger samme år, en uke som er tatt har venteliste, og den som har en uke, kan legge den i kalenderen sin. Fredagsoversikten over hvem som har hytta, lages med `/oversikt` i Claude Code.
 
 Til slutt skulle boka vises hos Miles, og fikk Miles' utseende og språk. `bilder/` viser kalenderen og en trekning før og etter.
 

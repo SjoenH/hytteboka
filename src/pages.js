@@ -2,7 +2,7 @@
 
 import { isEntered, sameName, uke, Uke } from './cabin.js';
 import { html } from './html.js';
-import { formatMoment, formatRange, monthOf, RULE_IN_WORDS, weekNumber, yearOf } from './weeks.js';
+import { formatMoment, formatRange, monthOf, RULE_IN_WORDS, yearOf } from './weeks.js';
 
 export function calendarPage({ weeks, today, name, wins, message, typedName }) {
   const months = [];
@@ -51,7 +51,7 @@ export function calendarPage({ weeks, today, name, wins, message, typedName }) {
   `);
 }
 
-function weekCard({ week, booking, draw, waiting }, { name, today, wins }) {
+function weekCard({ week, through, booking, draw, waiting }, { name, today, wins }) {
   const mine = Boolean(booking && name && sameName(booking.name, name));
   const state = draw ? (booking ? 'drawn' : 'draw') : booking ? 'booked' : 'free';
   const post = (action, label, quiet = false) => html`
@@ -79,21 +79,22 @@ function weekCard({ week, booking, draw, waiting }, { name, today, wins }) {
     // Nobody wins two weeks in the same year: someone who has won one is told so, and is not offered the draw.
     const won = wins[yearOf(week)];
     status = html`${countEntered(draw.entries.length)}${entered ? html`<br><strong>Du er med i trekningen</strong>` : ''}${
-      won ? html`<br>Du vant ${uke(won)}, og kan ikke vinne en uke til i ${yearOf(week)}` : ''}`;
+      won ? html`<br>Du vant ${won}, og kan ikke vinne en uke til i ${yearOf(week)}` : ''}`;
     if (entered) action = post('meld-av', 'Meld meg av', true);
     else if (name && !won) action = post('meld-pa', 'Meld meg på');
   } else {
     status = mine ? 'Du vant trekningen!' : html`<span class="person">${booking.name}</span> vant trekningen`;
-    if (mine) action = post('avbestill', 'Si fra deg uka', true);
+    // Easter is given up whole: nobody goes to the mountains for half of it.
+    if (mine) action = post('avbestill', through === week ? 'Si fra deg uka' : 'Si fra deg turen', true);
   }
 
   return html`
     <li class="week week--${state}${mine ? ' week--mine' : ''}" id="${week}">
       <p class="week-when">
-        <strong>Uke ${weekNumber(week)}</strong>
-        <span>${formatRange(week, { year: false })}</span>
+        <strong>${Uke(week, through)}</strong>
+        <span>${formatRange(week, { year: false, through })}</span>
       </p>
-      ${week === today ? html`<p class="tag">Denne uka</p>` : ''}
+      ${week <= today && today <= through ? html`<p class="tag">Denne uka</p>` : ''}
       ${draw ? html`<p class="tag tag--draw">${draw.label ? `Trekning · ${draw.label}` : 'Trekning'}</p>` : ''}
       <p class="week-status">${status}</p>
       ${queue}
@@ -134,21 +135,21 @@ function nameForm(typedName) {
     </form>`;
 }
 
-export function drawPage({ week, draw, booking, message }) {
+export function drawPage({ week, through, draw, booking, message }) {
   const names = draw.entries.map((entry) => entry.name);
   const drawn = Boolean(booking);
 
-  return page({ title: `Trekning om ${draw.label || Uke(week)}`, stage: true, script: '/trekning.js' }, html`
+  return page({ title: `Trekning om ${draw.label || Uke(week, through)}`, stage: true, script: '/trekning.js' }, html`
     <main class="draw${drawn ? ' is-done' : ''}" data-draw>
       <div class="stage-top">
         <p class="draw-kicker">Trekning om hytta</p>
         <img class="logo" src="/brand/miles-logo-cream.png" alt="Miles" width="1207" height="379">
       </div>
       <div class="draw-head">
-        <h1>${draw.label || Uke(week)}</h1>
+        <h1>${draw.label || Uke(week, through)}</h1>
         <span class="icon icon--feiring" aria-hidden="true"></span>
       </div>
-      <p class="draw-when">${draw.label ? `${Uke(week)} · ` : ''}${formatRange(week)}</p>
+      <p class="draw-when">${draw.label ? `${Uke(week, through)} · ` : ''}${formatRange(week, { through })}</p>
       ${alert(message)}
 
       ${names.length === 0 ? html`<p class="draw-empty">Ingen har meldt seg på ennå.</p>` : ''}
@@ -208,13 +209,13 @@ export function managerPage({ draws, freeWeeks, name, message }) {
   `);
 }
 
-function drawRow({ week, draw, booking }) {
+function drawRow({ week, through, draw, booking }) {
   const names = draw.entries.map((entry) => entry.name);
   return html`
     <li>
       <p class="draw-list-title">
-        <strong>${draw.label || Uke(week)}</strong>
-        <span>${draw.label ? `${Uke(week)} · ` : ''}${formatRange(week)}</span>
+        <strong>${draw.label || Uke(week, through)}</strong>
+        <span>${draw.label ? `${Uke(week, through)} · ` : ''}${formatRange(week, { through })}</span>
       </p>
       <p>${booking
         ? html`Trukket: <span class="person">${booking.name}</span> vant.`

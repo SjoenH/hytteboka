@@ -124,6 +124,17 @@ test('no line is longer than 75 bytes, and none is broken inside a letter', () =
   assert.ok(words(Object.fromEntries(read(file)).DESCRIPTION).startsWith(`${name} har firmahytta denne uka.`));
 });
 
+test('Easter, which is one trip of two weeks, is one event from its first Friday to its last', () => {
+  const event = Object.fromEntries(read(calendarFile({ week: '2027-W12', through: '2027-W13', booking: OLA })));
+  assert.equal(event.DTSTART, '20270319T150000Z', 'four in the afternoon on Friday 19 March');
+  assert.equal(event.DTEND, '20270402T100000Z', 'twelve on Friday 2 April: Good Friday is no changeover');
+  assert.equal(words(event.SUMMARY), 'Firmahytta, uke 12 og 13');
+  assert.match(words(event.DESCRIPTION), /^Ola Nordmann har firmahytta begge ukene\./);
+
+  const oneWeek = Object.fromEntries(read(calendarFile({ week: '2027-W12', booking: OLA })));
+  assert.equal(oneWeek.DTEND, '20270326T110000Z', 'a week on its own still ends on its Friday');
+});
+
 test('the file is named after the week', () => {
   assert.equal(calendarFileName(AUTUMN), 'hytta-2026-uke-45.ics');
   assert.equal(calendarFileName('2027-W08'), 'hytta-2027-uke-8.ics');

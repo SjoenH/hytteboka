@@ -91,6 +91,35 @@ describe('the overview sent out on Fridays', () => {
     assert.match(after, /^Uke 47, fre\. 13\. – fre\. 20\. november: Jonas Lie$/m);
   });
 
+  test('Easter, which is one trip of two weeks, is one line with both its Fridays', () => {
+    // Friday 12 March 2027, in the morning: the next four weeks are 11, 12, 13 and 14, and Easter is two of them.
+    const beforeEaster = new Date('2027-03-12T08:00:00Z');
+    const state = emptyState();
+    state.draws['2027-W12'] = { label: 'Påske', entries: entered('Ola Nordmann', 'Kari Hansen') };
+    state.bookings['2027-W14'] = { name: 'Per Olsen', at: AT };
+
+    assert.deepEqual(overviewText(state, beforeEaster).match(/^Uke .*$/gm), [
+      'Uke 11, fre. 12. – fre. 19. mars: ledig',
+      'Uke 12 og 13 (Påske), fre. 19. mars – fre. 2. april: trekning, ikke trukket ennå (2 påmeldte)',
+      'Uke 14, fre. 2. – fre. 9. april: Per Olsen',
+    ]);
+
+    state.bookings['2027-W12'] = { name: 'Kari Hansen', at: AT };
+    assert.match(overviewText(state, beforeEaster), /^Uke 12 og 13 \(Påske\), fre\. 19\. mars – fre\. 2\. april: Kari Hansen \(vant trekningen\)$/m);
+  });
+
+  test('sent in Easter’s first week, it still has the whole trip as its first line', () => {
+    // Friday 19 March 2027 at one o'clock: Easter has just begun, and its second week is the next of the four.
+    const state = emptyState();
+    state.draws['2027-W12'] = { label: 'Påske', entries: [] };
+    state.bookings['2027-W12'] = { name: 'Kari Hansen', at: AT };
+
+    assert.deepEqual(overviewText(state, new Date('2027-03-19T12:00:00Z')).match(/^Uke [^:]*/gm), [
+      'Uke 12 og 13 (Påske), fre. 19. mars – fre. 2. april', 'Uke 14, fre. 2. – fre. 9. april',
+      'Uke 15, fre. 9. – fre. 16. april', 'Uke 16, fre. 16. – fre. 23. april',
+    ]);
+  });
+
   test('the weeks run on across New Year', () => {
     // Friday 18 December 2026, in the morning.
     const text = overviewText(emptyState(), new Date('2026-12-18T08:00:00Z'));

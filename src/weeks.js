@@ -126,18 +126,30 @@ export function easterSunday(year) {
 }
 
 /**
- * The week of Easter on the cabin: the one with Palm Sunday and Maundy Thursday in it.
- * It ends at twelve on Good Friday, so the Easter weekend itself is in the week after.
+ * Easter on the cabin is one trip of two weeks: from the Friday before Palm Sunday to the Friday
+ * after Easter Monday. That is Ragnhild's rule, and her reason: nobody goes to the mountains for
+ * half an Easter. So the Good Friday in the middle is no changeover.
+ * `week` is the first of the two, the one with Palm Sunday and Maundy Thursday in it, and
+ * `through` the second, with Easter Sunday and Easter Monday.
  */
+export function easterTrip(year) {
+  const week = easterWeek(year);
+  return { week, through: addWeeks(week, 1) };
+}
+
+/** The first week of Easter's two. */
 export function easterWeek(year) {
   const maundyThursday = new Date(easterSunday(year).getTime() - 3 * DAY);
   return calendarWeekOf(maundyThursday);
 }
 
-/** "fre. 19. – fre. 26. mars 2027", or without the year where a heading above already says it. */
-export function formatRange(id, { year = true } = {}) {
+/**
+ * "fre. 19. – fre. 26. mars 2027", or without the year where a heading above already says it.
+ * With `through`, the range runs on to the end of that week: a trip of more weeks than one.
+ */
+export function formatRange(id, { year = true, through = id } = {}) {
   const from = startOf(id);
-  const to = endOf(id);
+  const to = endOf(through);
   const day = (date) => `${CHANGEOVER_DAY.short} ${date.getUTCDate()}.`;
   const month = (date) => MONTHS[date.getUTCMonth()];
   const sameYear = from.getUTCFullYear() === to.getUTCFullYear();

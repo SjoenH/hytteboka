@@ -10,6 +10,10 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
   Hytteuka går fra fredag til fredag, og de som reiser, er ute til klokka tolv. Da får de som kommer, hele helga på fjellet, og de som reiser, har helga hjemme. (Svar 11. oktober 2026.)
   Du sa først lørdag til lørdag, og rettet det til fredag samme dag. Før det antok første versjon mandag til søndag, og at folk avtalte byttet seg imellom. Det var feil.
 
+- **Hva er påsken?**
+  Påsken er én tur: fra fredagen før palmesøndag til fredagen etter andre påskedag, og én vinner får hele. Ingen reiser på fjellet for en halv påske. (Svar 11. oktober 2026.)
+  Før du sa det, antok jeg at påsken var den ene uka med palmesøndag og skjærtorsdag i, så vinneren måtte ut langfredag klokka tolv. Det var feil.
+
 - **Når kan de neste komme?**
   Etter jobb på fredagen. De som reiser, er ute til klokka tolv, så vaskehjelpen rekker over før neste gjeng kommer. (Svar 11. oktober 2026.)
   Før du sa det, antok jeg klokka tolv, og kalenderfila startet avtalen da. Det var feil.
@@ -44,10 +48,10 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
 ## Trekning
 
 8. **Hvilke uker skal det trekkes lodd om, og hvem bestemmer det?**
-   Antar: du bestemmer, uke for uke, på siden «For kontorsjefen». Påskeuka og uke 8 er lagt inn fra start så det er noe å se på. Vinterferien er uke 8, 9 eller 10 etter hvor i landet dere holder til; uke 8 er en gjetning.
+   Antar: du bestemmer, uke for uke, på siden «For kontorsjefen». Påsken og uke 8 er lagt inn fra start så det er noe å se på. Vinterferien er uke 8, 9 eller 10 etter hvor i landet dere holder til; uke 8 er en gjetning.
 
-9. **Hvilken uke er «påsken»?**
-   Antar: uka med palmesøndag og skjærtorsdag i, fra fredagen før palmesøndag til langfredag klokka tolv. Med bytte på fredag deler påsken seg på to uker: påskehelga, fra langfredag til andre påskedag, faller i uka etter, som er en vanlig uke. Si fra om det er den, eller begge, det skal trekkes lodd om.
+9. **Gjelder påsken som én tur hvert år?**
+   Antar: ja. Påsken regnes ut for hvert år, og trekningen på dens første uke gjelder begge ukene, hva du enn kaller den. Hva det betyr for resten av boka, står i punkt 49 til 57.
 
 10. **Har alle lik sjanse?**
     Antar: ja. Ett lodd per person, og den som fikk påsken i fjor, stiller likt med alle andre.
@@ -183,6 +187,37 @@ Hytteboka skal vises hos Miles, og Miles spurte: «Kan den se ut som oss?» Regl
 
 48. **Hvordan snakker Hytteboka?**
     Antar: som «vi» til «du», varmt og tydelig. Overskriften spør «Når vil du på hytta?», vinneren får «Gratulerer, og god tur!», og kontorsjefens side sier «vi». Knapper og feilmeldinger er som før, fordi de alt var korte og klare.
+
+## Påsken som én tur
+
+Du sa at påsken er én tur med én vinner, og hvorfor: ingen reiser på fjellet for en halv påske. Resten sa du ikke. Det er avgjort etter den grunnen.
+
+49. **Kan den som vinner påsken, vinne en uke til samme år?**
+    Antar: nei. Påsken er én trekning og én gevinst. Den som har påsken, kan ikke vinne vinterferien samme år, og omvendt.
+
+50. **Har påsken venteliste?**
+    Antar: nei, som andre uker det trekkes lodd om. Ingen kan vente på, eller booke, bare den ene av de to ukene.
+
+51. **Kan vinneren si fra seg halve påsken?**
+    Antar: nei. Turen sies fra hel, og trekkes da på nytt blant de andre som var påmeldt. Det kan vinneren gjøre helt til turen er over, fredagen etter andre påskedag klokka tolv.
+
+52. **Hva står i kalenderen til vinneren?**
+    Antar: én avtale for hele turen, fra klokka 16 fredagen før palmesøndag til klokka tolv fredagen etter andre påskedag.
+
+53. **Hva står i fredagsoversikten?**
+    Antar: én linje for påsken, med begge fredagene. Den teller som to av de fire ukene.
+
+54. **Hva skjer langfredag?**
+    Antar: ingenting. Det er ikke byttedag midt i påsken, så vinneren blir, og vaskehjelpen kommer ikke før turen er over.
+
+55. **Hva med dem som alt hadde meldt seg på påsketrekningen, da den gjaldt én uke?**
+    Antar: de er med i trekningen om hele turen, uten å måtte melde seg på igjen. De meldte seg på påsken, og ingen vil ha en halv. Den som bare kunne den ene uka, kan melde seg av.
+
+56. **Hva om noen alt har booket den andre påskeuka for seg selv?**
+    Antar: de beholder den. Ingenting tas fra noen. Da gjelder trekningen bare den første uka, slik den gjorde før, til de sier uka fra seg. Fra da er påsken én tur igjen.
+
+57. **Hva om du gjør påsken om til en vanlig uke?**
+    Antar: da er begge ukene vanlige uker, som bookes hver for seg. Det går bare så lenge ingen er påmeldt.
 
 ## Ikke med i første versjon
 

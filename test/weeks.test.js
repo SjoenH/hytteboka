@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  addWeeks, ARRIVAL_HOUR, CHANGEOVER_HOUR, currentWeek, easterSunday, easterWeek, endOf, endsAt, formatMoment,
+  addWeeks, ARRIVAL_HOUR, CHANGEOVER_HOUR, currentWeek, easterSunday, easterTrip, easterWeek, endOf, endsAt, formatMoment,
   formatRange, isWeekId, monthOf, RULE_IN_WORDS, startOf, startsAt, weekNumber, weeksFrom, yearOf,
 } from '../src/weeks.js';
 
@@ -137,13 +137,33 @@ test('Easter Sunday falls where the almanac says', () => {
   assert.equal(iso(easterSunday(2038)), '2038-04-25');
 });
 
-test('the week of Easter has Palm Sunday and Maundy Thursday in it, and ends on Good Friday', () => {
-  assert.equal(easterWeek(2027), '2027-W12');
-  assert.equal(iso(startOf(easterWeek(2027))), '2027-03-19', 'the Friday before Palm Sunday');
-  assert.equal(iso(endOf(easterWeek(2027))), '2027-03-26', 'Good Friday, two days before Easter Sunday');
+test('Easter is one trip of two weeks: from the Friday before Palm Sunday to the Friday after Easter Monday', () => {
+  // 2027: Palm Sunday 21 March, Good Friday 26 March, Easter Sunday 28 March, Easter Monday 29 March.
+  assert.deepEqual(easterTrip(2027), { week: '2027-W12', through: '2027-W13' });
+  assert.equal(iso(startOf('2027-W12')), '2027-03-19', 'the Friday before Palm Sunday');
+  assert.equal(iso(endOf('2027-W13')), '2027-04-02', 'the Friday after Easter Monday');
+  assert.equal(iso(endOf('2027-W12')), '2027-03-26', 'Good Friday is in the middle of it, and no changeover');
 
-  assert.equal(easterWeek(2026), '2026-W14');
-  assert.equal(iso(endOf(easterWeek(2026))), '2026-04-03');
+  // 2026: Easter Sunday 5 April.
+  assert.deepEqual(easterTrip(2026), { week: '2026-W14', through: '2026-W15' });
+  assert.equal(iso(startOf('2026-W14')), '2026-03-27');
+  assert.equal(iso(endOf('2026-W15')), '2026-04-10');
+
+  for (let year = 2025; year <= 2040; year += 1) {
+    const { week, through } = easterTrip(year);
+    const easter = easterSunday(year).getTime();
+    assert.equal(week, easterWeek(year));
+    assert.equal(through, addWeeks(week, 1));
+    assert.equal(easter - startOf(week).getTime(), 9 * 24 * HOUR, `${year}: it starts nine days before Easter Sunday`);
+    assert.equal(endOf(through).getTime() - easter, 5 * 24 * HOUR, `${year}: and ends five days after`);
+  }
+});
+
+test('those who have Easter come after work on its first Friday, and are out at twelve on its last', () => {
+  const { week, through } = easterTrip(2027);
+  // The clock is set forward on 28 March 2027, inside the trip.
+  assert.equal(startsAt(week).toISOString(), '2027-03-19T15:00:00.000Z');
+  assert.equal(endsAt(through).toISOString(), '2027-04-02T10:00:00.000Z');
 });
 
 test('a week is written with the two Fridays it runs between', () => {
@@ -152,6 +172,12 @@ test('a week is written with the two Fridays it runs between', () => {
   assert.equal(formatRange('2026-W53'), 'fre. 25. desember 2026 – fre. 1. januar 2027');
   assert.equal(formatRange('2027-W12', { year: false }), 'fre. 19. – fre. 26. mars');
   assert.equal(formatRange('2026-W53', { year: false }), 'fre. 25. desember – fre. 1. januar');
+});
+
+test('a trip of two weeks is written with its first Friday and its last', () => {
+  assert.equal(formatRange('2027-W12', { through: '2027-W13' }), 'fre. 19. mars – fre. 2. april 2027');
+  assert.equal(formatRange('2027-W12', { through: '2027-W13', year: false }), 'fre. 19. mars – fre. 2. april');
+  assert.equal(formatRange('2027-W12', { through: '2027-W12' }), formatRange('2027-W12'));
 });
 
 test('a week is listed under the month most of its nights fall in', () => {

@@ -6,7 +6,7 @@
 
 import { readFile } from 'node:fs/promises';
 import {
-  book, calendar, cancel, describe, drawWinner, enter, markDraw, readName, stopWaiting, unmarkDraw, wait, winsOf,
+  book, calendar, cancel, describe, drawWinner, enter, markDraw, readName, stopWaiting, unmarkDraw, wait, winsInWords,
   withdraw,
 } from './cabin.js';
 import { CALENDAR_TYPE, calendarFile, calendarFileName } from './ics.js';
@@ -78,7 +78,7 @@ export function createApp({ store, now = () => new Date() }) {
         weeks: calendar(store.state, today()),
         today: today(),
         name,
-        wins: winsOf(store.state, name),
+        wins: winsInWords(store.state, name),
         ...more,
       }));
 
@@ -104,7 +104,7 @@ export function createApp({ store, now = () => new Date() }) {
       const entry = isWeekId(week) ? describe(store.state, week) : null;
       if (!entry?.booking) return notFound();
       send(200, calendarFile(entry), CALENDAR_TYPE, {
-        'Content-Disposition': `attachment; filename="${calendarFileName(week)}"`,
+        'Content-Disposition': `attachment; filename="${calendarFileName(entry.week)}"`,
       });
     };
 

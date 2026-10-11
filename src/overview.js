@@ -11,7 +11,13 @@ import { addWeeks, currentWeek, formatRange, RULE_IN_WORDS } from './weeks.js';
  */
 export function overviewText(state, now = new Date()) {
   const thisWeek = currentWeek(now);
-  const weeks = [1, 2, 3, 4].map((ahead) => describe(state, addWeeks(thisWeek, ahead)));
+  // A trip of two weeks, as Easter is, is one line with both its Fridays.
+  const found = new Map();
+  for (const ahead of [1, 2, 3, 4]) {
+    const entry = describe(state, addWeeks(thisWeek, ahead));
+    found.set(entry.week, entry);
+  }
+  const weeks = [...found.values()];
 
   // The invitation to book is only there when there is a week to book.
   const anyFree = weeks.some(({ booking, draw }) => !booking && !draw);
@@ -30,9 +36,9 @@ export function overviewText(state, now = new Date()) {
   ].join('\n');
 }
 
-function line({ week, booking, draw }) {
-  const name = draw?.label ? `${Uke(week)} (${draw.label})` : Uke(week);
-  return `${name}, ${formatRange(week, { year: false })}: ${holder({ booking, draw })}`;
+function line({ week, through, booking, draw }) {
+  const name = draw?.label ? `${Uke(week, through)} (${draw.label})` : Uke(week, through);
+  return `${name}, ${formatRange(week, { year: false, through })}: ${holder({ booking, draw })}`;
 }
 
 function holder({ booking, draw }) {

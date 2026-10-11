@@ -18,10 +18,14 @@ export function calendarFileName(week) {
   return `hytta-${week.slice(0, 4)}-uke-${weekNumber(week)}.ics`;
 }
 
-/** The file for one booking: `booking` is what stands in the book for `week`, { name, at }. */
-export function calendarFile({ week, booking }) {
+/**
+ * The file for one booking: `booking` is what stands in the book for `week`, { name, at }.
+ * A trip that runs `through` to a later week, as Easter does, is one event from its first Friday to its last.
+ */
+export function calendarFile({ week, through = week, booking }) {
+  const weeks = through === week ? `uke ${weekNumber(week)}` : `uke ${weekNumber(week)} og ${weekNumber(through)}`;
   const about = [
-    `${booking.name} har firmahytta denne uka.`,
+    `${booking.name} har firmahytta ${through === week ? 'denne uka' : 'begge ukene'}.`,
     RULE_IN_WORDS,
     'Hentet fra Hytteboka. Sier du fra deg uka der, må du slette denne avtalen selv.',
   ].join('\n\n');
@@ -35,8 +39,8 @@ export function calendarFile({ week, booking }) {
     // When the booking was made, not when the file was asked for: the same booking gives the same file.
     `DTSTAMP:${moment(new Date(booking.at))}`,
     `DTSTART:${moment(startsAt(week))}`,
-    `DTEND:${moment(endsAt(week))}`,
-    `SUMMARY:${text(`Firmahytta, uke ${weekNumber(week)}`)}`,
+    `DTEND:${moment(endsAt(through))}`,
+    `SUMMARY:${text(`Firmahytta, ${weeks}`)}`,
     `DESCRIPTION:${text(about)}`,
     // Having the cabin is not being away from work: the week does not mark its owner as busy.
     'TRANSP:TRANSPARENT',
