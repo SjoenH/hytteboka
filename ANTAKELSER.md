@@ -7,8 +7,12 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
 ## Avklart av Ragnhild
 
 - **Hva er «en uke» på hytta?**
-  Hytteuka går alltid fra lørdag til lørdag, og de som reiser, er ute til klokka tolv. (Svar 11. oktober 2026.)
-  Første versjon antok mandag til søndag, og at folk avtalte byttet seg imellom. Det var feil.
+  Hytteuka går fra fredag til fredag, og de som reiser, er ute til klokka tolv. Da får de som kommer, hele helga på fjellet, og de som reiser, har helga hjemme. (Svar 11. oktober 2026.)
+  Du sa først lørdag til lørdag, og rettet det til fredag samme dag. Før det antok første versjon mandag til søndag, og at folk avtalte byttet seg imellom. Det var feil.
+
+- **Når kan de neste komme?**
+  Etter jobb på fredagen. De som reiser, er ute til klokka tolv, så vaskehjelpen rekker over før neste gjeng kommer. (Svar 11. oktober 2026.)
+  Før du sa det, antok jeg klokka tolv, og kalenderfila startet avtalen da. Det var feil.
 
 - **Kan én person vinne flere trekninger?**
   Den som vinner en trekning, kan ikke vinne en uke til samme år. (Svar på telefon 11. oktober 2026.)
@@ -17,16 +21,16 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
 ## Uker og booking
 
 1. **Hvilken hytteuke er «uke 8»?**
-   Antar: den som har mandag til fredag i uke 8 i seg. Den går fra lørdagen før uke 8 til lørdagen i uke 8.
+   Antar: den som har arbeidsuka i uke 8 i seg. Den går fra fredagen før uke 8 til fredagen i uke 8.
 
-2. **Når kan de neste komme?**
-   Antar: fra klokka tolv samme lørdag. Siden sier bare når de som reiser, skal være ute; den regner uka som den nestes fra da.
+2. **Hva er «etter jobb» på klokka?**
+   Antar: klokka 16. Siden sier «etter jobb», slik du sa det. Kalenderfila må ha et klokkeslett, og der starter avtalen klokka 16. I boka regnes uka som den nestes fra klokka tolv, når de forrige er ute.
 
 3. **Lånes hytta bare ut for hele uker?**
    Antar: ja. Én booking er hele hytta i hele uka. Ingen helger eller enkeltdøgn.
 
 4. **Hvor langt fram kan man booke?**
-   Antar: 52 uker, regnet fra uka vi er i. Uka vi er i kan også bookes, fram til den er over klokka tolv på lørdagen.
+   Antar: 52 uker, regnet fra uka vi er i. Uka vi er i kan også bookes, fram til den er over klokka tolv på fredagen.
 
 5. **Er det en grense for hvor mange uker én person kan ha?**
    Antar: nei. På vanlige uker er det førstemann til mølla.
@@ -43,7 +47,7 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
    Antar: du bestemmer, uke for uke, på siden «For kontorsjefen». Påskeuka og uke 8 er lagt inn fra start så det er noe å se på. Vinterferien er uke 8, 9 eller 10 etter hvor i landet dere holder til; uke 8 er en gjetning.
 
 9. **Hvilken uke er «påsken»?**
-   Antar: uka med skjærtorsdag og langfredag i, fra lørdagen før palmesøndag til påskeaften. Første og andre påskedag faller da i uka etter, som er en vanlig uke.
+   Antar: uka med palmesøndag og skjærtorsdag i, fra fredagen før palmesøndag til langfredag klokka tolv. Med bytte på fredag deler påsken seg på to uker: påskehelga, fra langfredag til andre påskedag, faller i uka etter, som er en vanlig uke. Si fra om det er den, eller begge, det skal trekkes lodd om.
 
 10. **Har alle lik sjanse?**
     Antar: ja. Ett lodd per person, og den som fikk påsken i fjor, stiller likt med alle andre.
@@ -52,7 +56,7 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
     Antar: året uka ligger i, ikke året det trekkes. Vinterferien 2027 og påsken 2027 er samme år, også om den ene trekkes før jul og den andre etter.
 
 12. **Hvilket år hører en uke rundt nyttår til?**
-    Antar: året de fleste nettene ligger i. Uka fra 26. desember 2026 til 2. januar 2027 teller for 2026.
+    Antar: året de fleste nettene ligger i. Uka fra 25. desember 2026 til 1. januar 2027 teller for 2026.
 
 13. **Kan man være med i flere trekninger samme år?**
     Antar: ja, fram til man vinner en av dem. Da tas loddene ut av de andre trekningene det året, og man kan ikke melde seg på flere.
@@ -88,7 +92,7 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
 ## Fredagsoversikten
 
 22. **Hvilke fire uker skal med?**
-    Antar: de fire etter uka vi er i. Sender du på fredag, starter den første dagen etter. Uka som er i gang, er ikke med.
+    Antar: de fire etter uka vi er i. Sender du før klokka tolv på fredag, er den første uka den som starter samme dag. Sender du etter tolv, starter den første neste fredag. Uka som er i gang, er ikke med.
 
 23. **Hva skal stå om en uke det trekkes lodd om?**
     Antar: at det er trekning, og hvor mange som er påmeldt, men ikke navnene. Etter trekningen står vinneren.
@@ -113,7 +117,7 @@ Du ba om «at folk får bookingen sin inn i kalenderen». Dette er det bygget et
     Antar: nei. Den som har en uke, trykker «Legg i kalenderen din» på uka, får en fil og åpner den i kalenderen sin. Siden vet bare hva folk heter, ikke e-postadressen deres, og den sender ikke e-post, så den kan ikke sende en invitasjon.
 
 29. **Hva skal stå i kalenderen?**
-    Antar: én avtale, «Firmahytta, uke 45», fra klokka tolv lørdagen uka starter til klokka tolv lørdagen den slutter. I avtalen står det hvem som har hytta, og at de som reiser, er ute til klokka tolv. At den starter klokka tolv, følger av antakelse 2. Jeg vet ikke hvor hytta ligger, så avtalen har ikke noe sted.
+    Antar: én avtale, «Firmahytta, uke 45», fra klokka 16 fredagen uka starter til klokka tolv fredagen den slutter. I avtalen står det hvem som har hytta, og regelen om fredag og klokka tolv. At den starter klokka 16, følger av antakelse 2. Jeg vet ikke hvor hytta ligger, så avtalen har ikke noe sted.
 
 30. **Skal uka stå som opptatt i kalenderen?**
     Antar: nei, den står som ledig tid. Å ha hytta er ikke det samme som å være borte fra jobb, og en hel uke som opptatt ville stengt for alle møter. Den som tar ferie, legger inn det selv.
@@ -153,7 +157,7 @@ Du ba om «en venteliste når uka er tatt». Hvordan den skal virke, sa du ikke,
     Antar: nei, slik det heller ikke er en grense for hvor mange uker én person kan ha (punkt 5). Man kan vente på flere uker, og ha andre uker samtidig.
 
 41. **Hvor lenge kan man sette seg på venteliste?**
-    Antar: så lenge uka kan bookes, altså til den er over klokka tolv på lørdagen. Den som står først, kan dermed få en uke som alt er i gang.
+    Antar: så lenge uka kan bookes, altså til den er over klokka tolv på fredagen. Den som står først, kan dermed få en uke som alt er i gang.
 
 42. **Kan man angre?**
     Antar: ja. Den som venter, kan ta seg av ventelista når som helst, og de bak rykker fram. Den som setter seg på igjen, stiller bakerst.

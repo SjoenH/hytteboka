@@ -1,15 +1,15 @@
 // A booking as a file that Outlook, Google Calendar, Apple's Calendar and the like can read:
 // iCalendar (RFC 5545), with one event in it.
 //
-// The event is the cabin week as `weeks.js` has it: from twelve on the Saturday it starts to
-// twelve on the Saturday it ends. Both are written as moments in UTC, so a calendar puts them at
-// twelve in Norway without having to be told what time zone Norway is in.
+// The event is the stay as `weeks.js` has it: from when those who have the week may come
+// (`startsAt`) to when they are out (`endsAt`). Both are written as moments in UTC, so a calendar
+// puts them right on the clock in Norway without having to be told what time zone Norway is in.
 //
 // The file is a copy of the booking, taken when someone asks for it. Nothing here can reach into
 // a calendar afterwards: a week that is given up stays in the calendar until its owner removes it.
 
 import { createHash } from 'node:crypto';
-import { CHANGEOVER_HOUR, endsAt, startsAt, weekNumber } from './weeks.js';
+import { endsAt, RULE_IN_WORDS, startsAt, weekNumber } from './weeks.js';
 
 export const CALENDAR_TYPE = 'text/calendar; charset=utf-8';
 
@@ -22,7 +22,7 @@ export function calendarFileName(week) {
 export function calendarFile({ week, booking }) {
   const about = [
     `${booking.name} har firmahytta denne uka.`,
-    `Hytteuka går fra lørdag til lørdag. De som reiser, er ute til klokka ${CHANGEOVER_HOUR}.`,
+    RULE_IN_WORDS,
     'Hentet fra Hytteboka. Sier du fra deg uka der, må du slette denne avtalen selv.',
   ].join('\n\n');
 

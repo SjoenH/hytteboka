@@ -2,7 +2,7 @@
 
 import { isEntered, sameName, uke, Uke } from './cabin.js';
 import { html } from './html.js';
-import { CHANGEOVER_HOUR, formatMoment, formatRange, monthOf, weekNumber, yearOf } from './weeks.js';
+import { formatMoment, formatRange, monthOf, RULE_IN_WORDS, weekNumber, yearOf } from './weeks.js';
 
 export function calendarPage({ weeks, today, name, wins, message, typedName }) {
   const months = [];
@@ -19,7 +19,7 @@ export function calendarPage({ weeks, today, name, wins, message, typedName }) {
       <div class="hero-text">
         <h1>Når vil du på <em>hytta?</em></h1>
         <p class="lead">Finn en ledig uke og book den. Ukene alle vil ha, trekker vi lodd om: meld deg på, så trekker vi vinneren mens hele kontoret ser på!</p>
-        <p class="hero-rule">Hytteuka går fra lørdag til lørdag. De som reiser, er ute til klokka ${CHANGEOVER_HOUR}.</p>
+        <p class="hero-rule">${RULE_IN_WORDS}</p>
       </div>
       <img class="hero-art" src="/brand/fjell.png" alt="" width="400" height="291">
     </section>

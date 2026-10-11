@@ -5,7 +5,7 @@ import {
   stopWaiting, unmarkDraw, wait, waitingFor, winsOf, withdraw,
 } from '../src/cabin.js';
 
-// The week the tests happen in: Saturday 10 to Saturday 17 October 2026.
+// The week the tests happen in: Friday 9 to Friday 16 October 2026.
 const TODAY = '2026-W42';
 const AUTUMN = '2026-W45';
 const EASTER = '2027-W12';
@@ -433,7 +433,7 @@ describe('nobody wins two weeks in the same year', () => {
   });
 
   test('a week around New Year counts for the year most of its nights fall in', () => {
-    // 26 December 2026 to 2 January 2027 counts for 2026, and 2 to 9 January 2027 for 2027.
+    // 25 December 2026 to 1 January 2027 counts for 2026, and 1 to 8 January 2027 for 2027.
     const state = bookWithDraws(['2026-W53', '2027-W01', WINTER], ['Ola Nordmann']);
     state.draws[WINTER].entries = [];
     state.draws['2027-W01'].entries = [];
@@ -445,7 +445,7 @@ describe('nobody wins two weeks in the same year', () => {
   });
 
   test('the year is the one the nights are in, also when the name of the week says the next', () => {
-    // "2026-W01" runs from 27 December 2025 to 3 January 2026: five of its seven nights are in 2025.
+    // "2026-W01" runs from 26 December 2025 to 2 January 2026: six of its seven nights are in 2025.
     const then = (name, week) => ({ name, week, today: '2025-W45', now: '2025-11-05T08:00:00.000Z' });
     const state = emptyState();
     for (const week of ['2025-W50', '2026-W01', '2026-W08']) state.draws[week] = { label: '', entries: [] };
@@ -576,10 +576,10 @@ describe('the book as it is shown', () => {
     assert.deepEqual(Object.keys(state.draws), ['2027-W08', '2027-W12']);
   });
 
-  test('Easter is still ahead until twelve on Easter Saturday, when its week ends', () => {
-    // Easter Saturday 2027 is 27 March, in winter time: twelve in Norway is 11:00 UTC.
-    assert.deepEqual(Object.keys(firstState(new Date('2027-03-27T10:59:00Z')).draws), ['2028-W08', '2027-W12']);
-    assert.deepEqual(Object.keys(firstState(new Date('2027-03-27T11:00:00Z')).draws), ['2028-W08']);
+  test('Easter is still ahead until twelve on Good Friday, when its week ends', () => {
+    // Good Friday 2027 is 26 March, in winter time: twelve in Norway is 11:00 UTC.
+    assert.deepEqual(Object.keys(firstState(new Date('2027-03-26T10:59:00Z')).draws), ['2028-W08', '2027-W12']);
+    assert.deepEqual(Object.keys(firstState(new Date('2027-03-26T11:00:00Z')).draws), ['2028-W08']);
   });
 
   test('a new book leaves out an Easter that is more than 52 weeks away', () => {

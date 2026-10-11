@@ -3,11 +3,11 @@
 // "du", and a door left open at the end.
 
 import { describe, Uke } from './cabin.js';
-import { addWeeks, CHANGEOVER_HOUR, currentWeek, formatRange } from './weeks.js';
+import { addWeeks, currentWeek, formatRange, RULE_IN_WORDS } from './weeks.js';
 
 /**
- * The next four weeks are the four after the one we are in. On a Friday that is from
- * tomorrow's changeover on; the week that ends tomorrow is not among them.
+ * The next four weeks are the four after the one we are in. Sent before twelve on a Friday, that
+ * starts with the week that begins the same day; sent after twelve, with the one after it.
  */
 export function overviewText(state, now = new Date()) {
   const thisWeek = currentWeek(now);
@@ -24,7 +24,7 @@ export function overviewText(state, now = new Date()) {
     '',
     ...weeks.map(line),
     '',
-    `Hytteuka går fra lørdag til lørdag. De som reiser, er ute til klokka ${CHANGEOVER_HOUR}.`,
+    RULE_IN_WORDS,
     '',
     closing,
   ].join('\n');

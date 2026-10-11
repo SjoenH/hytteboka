@@ -1,9 +1,10 @@
 # Hytteboka
 
-A week here is a **cabin week** (hytteuke): Saturday to Saturday, and those who leave are out by 12:00, Norwegian time. That is the customer's rule, and 12:00 on Saturday is when one week ends and the next begins. A week is never Monday to Sunday.
+A week here is a **cabin week** (hytteuke): Friday to Friday. Those who leave are out by 12:00, Norwegian time, so the cleaner gets through before the next group comes after work. Those who come get the whole weekend on the mountain, and those who leave have theirs at home. That is the customer's rule and her reason. A week is never Monday to Sunday.
 
-- A week's id looks like a calendar week, and names the cabin week that holds that week's Monday to Friday: `2027-W12` runs from Saturday 20 March to Saturday 27 March 2027.
-- `src/weeks.js` owns the rule. Take a week's days, its year, and which week it is now, from there.
+- A week changes hands at 12:00 on its Friday, and the stay starts after work that day. The hours between are the cleaner's.
+- A week's id looks like a calendar week, and names the cabin week around that working week: `2027-W12` runs from Friday 19 March to Friday 26 March 2027.
+- `src/weeks.js` owns the rule: its day, its hours and the sentence that tells people it. Take a week's days, its year, which week it is now, and that sentence, from there.
 
 The look and voice are Miles'; the `miles-brand` skill has the rules.
 

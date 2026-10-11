@@ -1,6 +1,6 @@
 // The server as people meet it: every request here goes over HTTP to a server on a port of its own,
 // with a book in a folder of its own. It is Wednesday 14 October 2026, at twelve in Norway, in the week
-// that runs from Saturday 10 to Saturday 17 October.
+// that runs from Friday 9 to Friday 16 October.
 
 import assert from 'node:assert/strict';
 import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -84,8 +84,8 @@ describe('the calendar', () => {
     assert.match(response.headers.get('content-type'), /text\/html/);
     assert.equal(page.match(/<li class="week /g).length, 52);
     assert.match(page, /<h2>Oktober 2026<\/h2>/);
-    assert.match(await card(visitor, '2026-W42'), /^Uke 42 lør\. 10\. – lør\. 17\. oktober Denne uka Ledig$/);
-    assert.match(await card(visitor, EASTER), /Uke 12 lør\. 20\. – lør\. 27\. mars Trekning · Påske Ingen påmeldt ennå Se trekningen/);
+    assert.match(await card(visitor, '2026-W42'), /^Uke 42 fre\. 9\. – fre\. 16\. oktober Denne uka Ledig$/);
+    assert.match(await card(visitor, EASTER), /Uke 12 fre\. 19\. – fre\. 26\. mars Trekning · Påske Ingen påmeldt ennå Se trekningen/);
     assert.match(await card(visitor, '2027-W08'), /Trekning · Vinterferie/);
   });
 
@@ -122,33 +122,33 @@ describe('the calendar', () => {
 });
 
 describe('the cabin week', () => {
-  // Saturday 17 October 2026, when the week of 10 to 17 October ends. Summer time: twelve in Norway is 10:00 UTC.
-  const BEFORE_TWELVE = new Date('2026-10-17T09:59:00Z');
-  const TWELVE = new Date('2026-10-17T10:00:00Z');
+  // Friday 16 October 2026, when the week of 9 to 16 October ends. Summer time: twelve in Norway is 10:00 UTC.
+  const BEFORE_TWELVE = new Date('2026-10-16T09:59:00Z');
+  const TWELVE = new Date('2026-10-16T10:00:00Z');
 
-  test('the calendar says that the week runs from Saturday to Saturday, and when those who leave are out', async () => {
+  test('the calendar says the rule: Friday to Friday, out by twelve for the cleaner, and the next come after work', async () => {
     const page = await (await visitor.get('/')).text();
-    assert.match(page, /Hytteuka går fra lørdag til lørdag\. De som reiser, er ute til klokka 12\./);
+    assert.match(page, /<p class="hero-rule">Hytteuka går fra fredag til fredag\. De som reiser, er ute til klokka 12, så vaskehjelpen rekker over før de neste kommer etter jobb\.<\/p>/);
   });
 
-  test('a week ends on the Saturday the next one starts', async () => {
-    assert.match(await card(visitor, '2026-W42'), /^Uke 42 lør\. 10\. – lør\. 17\. oktober /);
-    assert.match(await card(visitor, '2026-W43'), /^Uke 43 lør\. 17\. – lør\. 24\. oktober /);
-    assert.match(await card(visitor, '2026-W44'), /^Uke 44 lør\. 24\. – lør\. 31\. oktober /);
+  test('a week ends on the Friday the next one starts', async () => {
+    assert.match(await card(visitor, '2026-W42'), /^Uke 42 fre\. 9\. – fre\. 16\. oktober /);
+    assert.match(await card(visitor, '2026-W43'), /^Uke 43 fre\. 16\. – fre\. 23\. oktober /);
+    assert.match(await card(visitor, '2026-W44'), /^Uke 44 fre\. 23\. – fre\. 30\. oktober /);
   });
 
-  test('until twelve on Saturday the week that ends is still this week, and can be booked', async () => {
+  test('until twelve on Friday the week that ends is still this week, and can be booked', async () => {
     now = BEFORE_TWELVE;
     assert.match(await card(visitor, '2026-W42'), /Denne uka Ledig$/);
     assert.equal((await ola.post('/uker/2026-W42/book')).status, 303);
   });
 
-  test('from twelve on Saturday the next week is this week, and the one that ended is over', async () => {
+  test('from twelve on Friday the next week is this week, and the one that ended is over', async () => {
     now = TWELVE;
     const page = await (await visitor.get('/')).text();
     assert.doesNotMatch(page, /id="2026-W42"/);
     assert.equal(page.match(/<li class="week /g).length, 52);
-    assert.match(await card(visitor, '2026-W43'), /^Uke 43 lør\. 17\. – lør\. 24\. oktober Denne uka Ledig$/);
+    assert.match(await card(visitor, '2026-W43'), /^Uke 43 fre\. 16\. – fre\. 23\. oktober Denne uka Ledig$/);
 
     const late = await ola.post('/uker/2026-W42/book');
     assert.equal(late.status, 409);
@@ -165,20 +165,21 @@ describe('the cabin week', () => {
   });
 });
 
-// Ragnhild wrote that the page says the cabin is taken when one group leaves on a Saturday and
-// the next arrives the same Saturday. These go through that Saturday: 17 October 2026, when
+// Ragnhild wrote that the page says the cabin is taken when one group leaves and the next arrives
+// the same day. That was when the day was Saturday; it is Friday now, and these go through one:
+// 16 October 2026, when
 // Ola's week (10 to 17 October) ends and Kari's (17 to 24 October) starts.
-describe('the Saturday one group leaves and the next arrives', () => {
+describe('the Friday one group leaves and the next arrives', () => {
   const LEAVING = '2026-W42';
   const ARRIVING = '2026-W43';
-  const MORNING = new Date('2026-10-17T08:30:00Z'); // 10:30 in Norway, before those who leave are out
-  const AFTERNOON = new Date('2026-10-17T13:00:00Z'); // 15:00 in Norway
+  const MORNING = new Date('2026-10-16T08:30:00Z'); // 10:30 in Norway, before those who leave are out
+  const AFTERNOON = new Date('2026-10-16T13:00:00Z'); // 15:00 in Norway: the cleaner's hours, before the next come
 
-  test('the week that starts that Saturday is free and can be booked, though the week that ends then is taken', async () => {
+  test('the week that starts that Friday is free and can be booked, though the week that ends then is taken', async () => {
     await ola.post(`/uker/${LEAVING}/book`);
 
-    assert.equal(await card(kari, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Booket av Ola Nordmann Sett meg på venteliste');
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Ledig Book uka');
+    assert.equal(await card(kari, LEAVING), 'Uke 42 fre. 9. – fre. 16. oktober Denne uka Booket av Ola Nordmann Sett meg på venteliste');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 fre. 16. – fre. 23. oktober Ledig Book uka');
 
     assert.equal((await kari.post(`/uker/${ARRIVING}/book`)).status, 303);
     assert.equal(book().bookings[LEAVING].name, 'Ola Nordmann');
@@ -191,24 +192,24 @@ describe('the Saturday one group leaves and the next arrives', () => {
     assert.deepEqual(Object.keys(book().bookings).sort(), [LEAVING, ARRIVING]);
   });
 
-  test('on the Saturday morning the page shows both: those who leave have this week, those who arrive the next', async () => {
+  test('on the Friday morning the page shows both: those who leave have this week, those who arrive the next', async () => {
     await ola.post(`/uker/${LEAVING}/book`);
     await kari.post(`/uker/${ARRIVING}/book`);
     now = MORNING;
 
-    assert.equal(await card(kari, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Booket av Ola Nordmann Sett meg på venteliste');
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Du har hytta Si fra deg uka Legg i kalenderen din');
-    assert.equal(await card(ola, LEAVING), 'Uke 42 lør. 10. – lør. 17. oktober Denne uka Du har hytta Si fra deg uka Legg i kalenderen din');
-    assert.equal(await card(ola, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Booket av Kari Hansen Sett meg på venteliste');
+    assert.equal(await card(kari, LEAVING), 'Uke 42 fre. 9. – fre. 16. oktober Denne uka Booket av Ola Nordmann Sett meg på venteliste');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 fre. 16. – fre. 23. oktober Du har hytta Si fra deg uka Legg i kalenderen din');
+    assert.equal(await card(ola, LEAVING), 'Uke 42 fre. 9. – fre. 16. oktober Denne uka Du har hytta Si fra deg uka Legg i kalenderen din');
+    assert.equal(await card(ola, ARRIVING), 'Uke 43 fre. 16. – fre. 23. oktober Booket av Kari Hansen Sett meg på venteliste');
   });
 
-  test('on the Saturday morning itself, the week that starts that day can still be booked', async () => {
+  test('on the Friday morning itself, the week that starts that day can still be booked', async () => {
     await ola.post(`/uker/${LEAVING}/book`);
     now = MORNING;
 
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Ledig Book uka');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 fre. 16. – fre. 23. oktober Ledig Book uka');
     assert.equal((await kari.post(`/uker/${ARRIVING}/book`)).status, 303);
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Du har hytta Si fra deg uka Legg i kalenderen din');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 fre. 16. – fre. 23. oktober Du har hytta Si fra deg uka Legg i kalenderen din');
   });
 
   test('after twelve the week of those who left is gone, and this week belongs to those who arrived', async () => {
@@ -217,20 +218,20 @@ describe('the Saturday one group leaves and the next arrives', () => {
     now = AFTERNOON;
 
     assert.doesNotMatch(await (await kari.get('/')).text(), new RegExp(`id="${LEAVING}"`));
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Du har hytta Si fra deg uka Legg i kalenderen din');
-    assert.equal(await card(ola, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Booket av Kari Hansen Sett meg på venteliste');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 fre. 16. – fre. 23. oktober Denne uka Du har hytta Si fra deg uka Legg i kalenderen din');
+    assert.equal(await card(ola, ARRIVING), 'Uke 43 fre. 16. – fre. 23. oktober Denne uka Booket av Kari Hansen Sett meg på venteliste');
   });
 
   test('after twelve the week that started that day is free for whoever comes, if nobody had booked it', async () => {
     await ola.post(`/uker/${LEAVING}/book`);
     now = AFTERNOON;
 
-    assert.equal(await card(kari, ARRIVING), 'Uke 43 lør. 17. – lør. 24. oktober Denne uka Ledig Book uka');
+    assert.equal(await card(kari, ARRIVING), 'Uke 43 fre. 16. – fre. 23. oktober Denne uka Ledig Book uka');
     assert.equal((await kari.post(`/uker/${ARRIVING}/book`)).status, 303);
   });
 
   test('the weeks on both sides of a week that was drawn can be booked', async () => {
-    // The winter break, 20 to 27 February 2027, shares a Saturday with the week before and the week after.
+    // The winter break, 19 to 26 February 2027, shares a Friday with the week before and the week after.
     for (const who of [ola, kari, per]) await who.post('/uker/2027-W08/meld-pa');
     await visitor.post('/trekning/2027-W08/trekk', { klar: 'ja' });
     const winner = book().bookings['2027-W08'].name;
@@ -256,9 +257,9 @@ describe('booking', () => {
     assert.equal(response.status, 303);
     assert.equal(response.headers.get('location'), `/#${AUTUMN}`);
 
-    assert.equal(await card(ola, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Du har hytta Si fra deg uka Legg i kalenderen din');
-    assert.equal(await card(kari, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Booket av Ola Nordmann Sett meg på venteliste');
-    assert.equal(await card(visitor, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Booket av Ola Nordmann');
+    assert.equal(await card(ola, AUTUMN), 'Uke 45 fre. 30. oktober – fre. 6. november Du har hytta Si fra deg uka Legg i kalenderen din');
+    assert.equal(await card(kari, AUTUMN), 'Uke 45 fre. 30. oktober – fre. 6. november Booket av Ola Nordmann Sett meg på venteliste');
+    assert.equal(await card(visitor, AUTUMN), 'Uke 45 fre. 30. oktober – fre. 6. november Booket av Ola Nordmann');
     assert.equal(book().bookings[AUTUMN].name, 'Ola Nordmann');
   });
 
@@ -305,7 +306,7 @@ describe('booking', () => {
 
 // Ragnhild asked for a waiting list when the week is taken. Ola has the autumn week, 31 October to 7 November.
 describe('the waiting list', () => {
-  const WEEK = 'Uke 45 lør. 31. oktober – lør. 7. november';
+  const WEEK = 'Uke 45 fre. 30. oktober – fre. 6. november';
   const nina = person('Nina Berg');
   beforeEach(() => ola.post(`/uker/${AUTUMN}/book`));
 
@@ -394,7 +395,7 @@ describe('the waiting list', () => {
     await ola.post(`/uker/${AUTUMN}/avbestill`);
 
     assert.equal(await notice(kari), parts(
-      'Du har fått uke 45, lør. 31. oktober – lør. 7. november 2026.',
+      'Du har fått uke 45, fre. 30. oktober – fre. 6. november 2026.',
       'Du sto først på ventelista da Ola Nordmann sa fra seg uka.',
       'Passer den ikke lenger, sier du den fra deg.',
     ));
@@ -476,7 +477,7 @@ describe('the waiting list', () => {
     await nina.post(`/uker/${EASTER}/meld-pa`);
     await visitor.post(`/trekning/${EASTER}/trekk`, { klar: 'ja' });
 
-    assert.equal(await card(kari, EASTER), 'Uke 12 lør. 20. – lør. 27. mars Trekning · Påske Nina Berg vant trekningen Se trekningen');
+    assert.equal(await card(kari, EASTER), 'Uke 12 fre. 19. – fre. 26. mars Trekning · Påske Nina Berg vant trekningen Se trekningen');
     const response = await kari.post(`/uker/${EASTER}/vent`);
     assert.equal(response.status, 409);
     assert.match(
@@ -489,7 +490,7 @@ describe('the waiting list', () => {
     await ola.post('/uker/2026-W42/book');
     assert.equal((await kari.post('/uker/2026-W42/vent')).status, 303);
 
-    now = new Date('2026-10-17T10:00:00Z'); // Saturday at twelve, when the week ends
+    now = new Date('2026-10-16T10:00:00Z'); // Friday at twelve, when the week ends
     const late = await per.post('/uker/2026-W42/vent');
     assert.equal(late.status, 409);
     assert.match(await late.text(), /role="alert">Uke 42 er over\./);
@@ -549,7 +550,7 @@ describe('the draw', () => {
 
     assert.equal(response.status, 200);
     assert.match(page, /<h1>Påske<\/h1>/);
-    assert.match(page, /Uke 12 · lør\. 20\. – lør\. 27\. mars 2027/);
+    assert.match(page, /Uke 12 · fre\. 19\. – fre\. 26\. mars 2027/);
     assert.deepEqual(
       [...page.matchAll(/<li class="ticket" data-ticket>([^<]*)<\/li>/g)].map((found) => found[1]),
       ['Ola Nordmann', 'Kari Hansen', 'Per Olsen'],
@@ -670,7 +671,7 @@ describe('nobody wins two weeks in the same year', () => {
 
     assert.equal(
       await card(winner, EASTER),
-      'Uke 12 lør. 20. – lør. 27. mars Trekning · Påske 2 påmeldte Du vant uke 8, og kan ikke vinne en uke til i 2027 Se trekningen',
+      'Uke 12 fre. 19. – fre. 26. mars Trekning · Påske 2 påmeldte Du vant uke 8, og kan ikke vinne en uke til i 2027 Se trekningen',
     );
     const again = await winner.post(`/uker/${EASTER}/meld-pa`);
     assert.equal(again.status, 409);
@@ -711,10 +712,10 @@ describe('for the office manager', () => {
     await kari.post(`/uker/${EASTER}/meld-pa`);
     const page = await (await visitor.get('/kontorsjef')).text();
 
-    assert.match(page, /<strong>Påske<\/strong>\s*<span>Uke 12 · lør\. 20\. – lør\. 27\. mars 2027<\/span>/);
+    assert.match(page, /<strong>Påske<\/strong>\s*<span>Uke 12 · fre\. 19\. – fre\. 26\. mars 2027<\/span>/);
     assert.match(page, /2 påmeldte: <span class="person">Ola Nordmann, Kari Hansen<\/span>/);
     assert.match(page, new RegExp(`href="/trekning/${EASTER}">Åpne trekningen`));
-    assert.match(page, /<option value="2026-W45">Uke 45 · lør\. 31\. oktober – lør\. 7\. november 2026<\/option>/);
+    assert.match(page, /<option value="2026-W45">Uke 45 · fre\. 30\. oktober – fre\. 6\. november 2026<\/option>/);
     assert.doesNotMatch(page, /<option value="2027-W12">/, 'a week that is set up is not offered again');
   });
 
@@ -757,7 +758,7 @@ describe('the booking in your own calendar', () => {
     assert.doesNotMatch(await (await ola.get('/')).text(), /kalender\.ics/, 'nothing to fetch before he has a week');
     await ola.post(`/uker/${AUTUMN}/book`);
 
-    assert.equal(await card(ola, AUTUMN), 'Uke 45 lør. 31. oktober – lør. 7. november Du har hytta Si fra deg uka Legg i kalenderen din');
+    assert.equal(await card(ola, AUTUMN), 'Uke 45 fre. 30. oktober – fre. 6. november Du har hytta Si fra deg uka Legg i kalenderen din');
     const page = await (await ola.get('/')).text();
     assert.match(page, link(AUTUMN));
     assert.equal(page.match(/kalender\.ics/g).length, 1, 'only on the week that is his');
@@ -779,16 +780,16 @@ describe('the booking in your own calendar', () => {
     assert.ok(file.endsWith('END:VCALENDAR\r\n'));
   });
 
-  test('the event in it is his week: from twelve on Saturday 31 October to twelve on Saturday 7 November', async () => {
+  test('the event in it is his week: from after work on Friday 30 October to twelve on Friday 6 November', async () => {
     await ola.post(`/uker/${AUTUMN}/book`);
     const event = lines(await (await ola.get(FILE)).text());
 
     // Winter time: twelve in Norway is 11:00 UTC.
-    assert.equal(event.DTSTART, '20261031T110000Z');
-    assert.equal(event.DTEND, '20261107T110000Z');
+    assert.equal(event.DTSTART, '20261030T150000Z', 'four in the afternoon in Norway, in winter time');
+    assert.equal(event.DTEND, '20261106T110000Z', 'twelve in Norway');
     assert.equal(event.SUMMARY, 'Firmahytta\\, uke 45');
     assert.match(event.DESCRIPTION, /^Ola Nordmann har firmahytta denne uka\./);
-    assert.match(event.DESCRIPTION, /De som reiser\\, er ute til klokka 12\./);
+    assert.match(event.DESCRIPTION, /Hytteuka går fra fredag til fredag\. De som reiser\\, er ute til klokka 12\\, så vaskehjelpen rekker over før de neste kommer etter jobb\./);
     assert.equal(event.DTSTAMP, '20261014T100000Z', 'when he booked');
   });
 
@@ -809,10 +810,10 @@ describe('the booking in your own calendar', () => {
     assert.match(await card(ola, EASTER), /Du vant trekningen! Si fra deg uka Legg i kalenderen din Se trekningen$/);
     assert.match(await (await ola.get('/')).text(), link(EASTER));
 
-    // The clock is set forward on 28 March 2027, the day after: both Saturdays are in winter time.
+    // The clock is set forward on 28 March 2027, two days after: both Fridays are in winter time.
     const event = lines(await (await ola.get(`/uker/${EASTER}/kalender.ics`)).text());
-    assert.equal(event.DTSTART, '20270320T110000Z');
-    assert.equal(event.DTEND, '20270327T110000Z');
+    assert.equal(event.DTSTART, '20270319T150000Z');
+    assert.equal(event.DTEND, '20270326T110000Z');
     assert.equal(event.SUMMARY, 'Firmahytta\\, uke 12');
   });
 
@@ -868,7 +869,7 @@ describe('the booking in your own calendar', () => {
 // someone without their booking it, and a week that is given up may have a new owner at once.
 describe('a week from the waiting list, in your own calendar', () => {
   const FILE = `/uker/${AUTUMN}/kalender.ics`;
-  const WEEK = 'Uke 45 lør. 31. oktober – lør. 7. november';
+  const WEEK = 'Uke 45 fre. 30. oktober – fre. 6. november';
   const GIVEN_UP = new Date('2026-10-20T07:30:00Z');
   /** The lines of a calendar file, by name, with lines that were broken put together again. */
   const lines = (text) =>
@@ -976,7 +977,7 @@ describe('a week from the waiting list, in your own calendar', () => {
     await ola.post('/uker/2026-W42/avbestill');
 
     const hers = lines(await (await kari.get('/uker/2026-W42/kalender.ics')).text());
-    assert.deepEqual([hers.DTSTART, hers.DTEND], ['20261010T100000Z', '20261017T100000Z']);
+    assert.deepEqual([hers.DTSTART, hers.DTEND], ['20261009T140000Z', '20261016T100000Z']);
     assert.equal(hers.DTSTAMP, '20261015T080000Z');
     assert.deepEqual(await offered(kari), ['2026-W42']);
   });
@@ -1054,7 +1055,7 @@ describe('Miles’ look and voice', () => {
     const { calendar, manager } = await pages();
     assert.match(calendar, /<h1>Når vil du på <em>hytta\?<\/em><\/h1>/);
     assert.match(calendar, /Ukene alle vil ha, trekker vi lodd om: meld deg på, så trekker vi vinneren mens hele kontoret ser på!/);
-    assert.match(calendar, /Hytteuka går fra lørdag til lørdag\. De som reiser, er ute til klokka 12\./);
+    assert.match(calendar, /Hytteuka går fra fredag til fredag\. De som reiser, er ute til klokka 12, så vaskehjelpen rekker over før de neste kommer etter jobb\./);
     assert.match(manager, /<h2>Ukene vi trekker lodd om<\/h2>/);
     assert.match(manager, /Hva kaller vi uka\?/);
   });

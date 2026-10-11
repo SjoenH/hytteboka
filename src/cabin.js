@@ -6,7 +6,7 @@
 //   draws:    { [week]: { label, entries: [{ name, at }] } } the weeks a winner is drawn for
 //   waiting:  { [week]: [{ name, at }] }                     who waits for a week that is taken, the first one first
 //
-// A week is a week on the cabin, Saturday to Saturday: `weeks.js` says which days that is.
+// A week is a week on the cabin, not of the calendar: `weeks.js` says which days that is.
 // A week has at most one booking, since bookings are kept by week.
 // A week has people waiting only while it is booked, and never when a winner is drawn for it. When the one
 // who has it gives it up, the first of them gets it: that booking's `after` is the name of the one who gave it up.

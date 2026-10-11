@@ -40,28 +40,28 @@ test('the file is one calendar with one event in it, and every line ends as the 
   assert.doesNotMatch(file.replaceAll('\r\n', ''), /[\r\n]/, 'no line ends any other way');
 });
 
-test('the event runs from twelve on the Saturday the week starts to twelve on the Saturday it ends', () => {
-  // 31 October to 7 November 2026, winter time: twelve in Norway is 11:00 UTC.
+test('the event runs from after work on the Friday the week starts to twelve on the Friday it ends', () => {
+  // 30 October to 6 November 2026, winter time: four in the afternoon in Norway is 15:00 UTC, and twelve is 11:00.
   const event = eventOf(AUTUMN, OLA);
-  assert.equal(event.DTSTART, '20261031T110000Z');
-  assert.equal(event.DTEND, '20261107T110000Z');
+  assert.equal(event.DTSTART, '20261030T150000Z');
+  assert.equal(event.DTEND, '20261106T110000Z');
 });
 
-test('twelve is twelve in Norway in summer time too, and in a week the clock is set in', () => {
-  assert.equal(eventOf('2027-W28', OLA).DTSTART, '20270710T100000Z');
-  assert.equal(eventOf('2027-W28', OLA).DTEND, '20270717T100000Z');
+test('the hours are hours in Norway in summer time too, and in a week the clock is set in', () => {
+  assert.equal(eventOf('2027-W28', OLA).DTSTART, '20270709T140000Z');
+  assert.equal(eventOf('2027-W28', OLA).DTEND, '20270716T100000Z');
   // The clock is set back on 25 October 2026.
-  assert.equal(eventOf('2026-W44', OLA).DTSTART, '20261024T100000Z');
-  assert.equal(eventOf('2026-W44', OLA).DTEND, '20261031T110000Z');
+  assert.equal(eventOf('2026-W44', OLA).DTSTART, '20261023T140000Z');
+  assert.equal(eventOf('2026-W44', OLA).DTEND, '20261030T110000Z');
 });
 
-test('the event says what it is, who has the cabin, and when those who leave are out', () => {
+test('the event says what it is, who has the cabin, and the rule with its reason', () => {
   const event = eventOf(AUTUMN, OLA);
   assert.equal(words(event.SUMMARY), 'Firmahytta, uke 45');
   assert.equal(
     words(event.DESCRIPTION),
     'Ola Nordmann har firmahytta denne uka.\n\n'
-      + 'Hytteuka går fra lørdag til lørdag. De som reiser, er ute til klokka 12.\n\n'
+      + 'Hytteuka går fra fredag til fredag. De som reiser, er ute til klokka 12, så vaskehjelpen rekker over før de neste kommer etter jobb.\n\n'
       + 'Hentet fra Hytteboka. Sier du fra deg uka der, må du slette denne avtalen selv.',
   );
 });
@@ -101,7 +101,7 @@ test('a name cannot start a line of its own in the file', () => {
   const event = read(file);
 
   assert.equal(event.filter(([name]) => name === 'DTSTART').length, 1);
-  assert.equal(Object.fromEntries(event).DTSTART, '20261031T110000Z');
+  assert.equal(Object.fromEntries(event).DTSTART, '20261030T150000Z');
 });
 
 test('no line is longer than 75 bytes, and none is broken inside a letter', () => {
