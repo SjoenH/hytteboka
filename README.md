@@ -2,7 +2,9 @@
 
 Booking av firmahytta, med trekning om ukene alle vil ha.
 
-Dette er et øvingsprosjekt. Det er bygget av Claude Code fra én melding fra en oppdiktet kunde, som en prøvekjøring av øvelsen i kurset «Agentisk koding». Historikken følger kundens meldinger: én commit for hver ting hun ber om.
+Dette er en prøvekjøring av øvelsen i Miles-kurset «Agentisk koding», som holdes 14. oktober 2026. Den ble gjort 11. oktober 2026: Claude Code fikk én melding fra en oppdiktet kunde og bygget resten derfra. Historikken følger kundens meldinger, én commit for hver ting hun ber om.
+
+På kurset bygger deltakerne sin egen utgave fra en tom mappe. Denne er til å se på etterpå, ikke til å kopiere fra underveis.
 
 ## Oppdraget
 
