@@ -463,6 +463,36 @@ a:active { color: var(--cabin); }
 
 .person { font-weight: 600; }
 
+/* The waiting list of a week that is taken, and the word to someone who got a week from it */
+
+.week-note { color: var(--muted); }
+.week-note strong { color: var(--ink); }
+
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-block-start: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  border-block-start: 1px solid var(--line);
+}
+
+.queue ol {
+  padding-inline-start: 1.6rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.notice {
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+  background: oklch(95% 0.045 160);
+  border-inline-start: 0.3rem solid var(--pine);
+  border-radius: 0.5rem;
+}
+
 /* For the office manager */
 
 .panel {

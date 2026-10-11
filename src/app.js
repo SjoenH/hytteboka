@@ -6,7 +6,8 @@
 
 import { readFile } from 'node:fs/promises';
 import {
-  book, calendar, cancel, describe, drawWinner, enter, markDraw, readName, unmarkDraw, winsOf, withdraw,
+  book, calendar, cancel, describe, drawWinner, enter, markDraw, readName, stopWaiting, unmarkDraw, wait, winsOf,
+  withdraw,
 } from './cabin.js';
 import { CALENDAR_TYPE, calendarFile, calendarFileName } from './ics.js';
 import { calendarPage, drawPage, managerPage, messagePage } from './pages.js';
@@ -22,7 +23,9 @@ const FILES = {
   '/hytte.svg': 'image/svg+xml',
 };
 
-const WEEK_RULES = { book, avbestill: cancel, 'meld-pa': enter, 'meld-av': withdraw };
+const WEEK_RULES = {
+  book, avbestill: cancel, 'meld-pa': enter, 'meld-av': withdraw, vent: wait, 'ikke-vent': stopWaiting,
+};
 
 // The pages load their own files and nothing else, and run no script written into a page.
 const HEADERS = {
@@ -121,7 +124,7 @@ export function createApp({ store, now = () => new Date() }) {
       return goTo('/', { 'Set-Cookie': remember });
     }
 
-    if ((match = /^\/uker\/([^/]+)\/(book|avbestill|meld-pa|meld-av)$/.exec(pathname))) {
+    if ((match = /^\/uker\/([^/]+)\/(book|avbestill|meld-pa|meld-av|vent|ikke-vent)$/.exec(pathname))) {
       const [, week, action] = match;
       const result = store.change(WEEK_RULES[action], { ...wish, week, name });
       return result.ok ? goTo(`/#${week}`) : showCalendar(result.status, { message: result.message });
