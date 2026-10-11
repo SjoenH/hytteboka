@@ -29,7 +29,7 @@ export function calendarFile({ week, booking }) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Havbris AS//Hytteboka//NB',
+    'PRODID:-//Miles//Hytteboka//NB',
     'BEGIN:VEVENT',
     `UID:${uidOf(week, booking)}`,
     // When the booking was made, not when the file was asked for: the same booking gives the same file.

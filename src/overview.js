@@ -1,5 +1,6 @@
-// The overview Ragnhild sends out on Fridays: who has the cabin the next four weeks,
-// as plain text in Norwegian to paste into an e-mail.
+// The overview sent out on Fridays: who has the cabin the next four weeks, as plain text in
+// Norwegian to paste into an e-mail. It is written the way Miles writes to colleagues: a greeting,
+// "du", and a door left open at the end.
 
 import { describe, Uke } from './cabin.js';
 import { addWeeks, CHANGEOVER_HOUR, currentWeek, formatRange } from './weeks.js';
@@ -12,12 +13,20 @@ export function overviewText(state, now = new Date()) {
   const thisWeek = currentWeek(now);
   const weeks = [1, 2, 3, 4].map((ahead) => describe(state, addWeeks(thisWeek, ahead)));
 
+  // The invitation to book is only there when there is a week to book.
+  const anyFree = weeks.some(({ booking, draw }) => !booking && !draw);
+  const closing = `${anyFree ? 'Ser du en ledig uke? Da er det bare å booke den i Hytteboka. ' : ''}God tur til alle som skal av gårde!`;
+
   return [
-    'Hytta de neste fire ukene:',
+    'Hei!',
+    '',
+    'Her er hvem som har hytta de neste fire ukene:',
     '',
     ...weeks.map(line),
     '',
     `Hytteuka går fra lørdag til lørdag. De som reiser, er ute til klokka ${CHANGEOVER_HOUR}.`,
+    '',
+    closing,
   ].join('\n');
 }
 

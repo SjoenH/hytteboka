@@ -3,11 +3,12 @@
 // that runs from Saturday 10 to Saturday 17 October.
 
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, beforeEach, describe, test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { createApp } from '../src/app.js';
 import { firstState } from '../src/cabin.js';
 import { openStore } from '../src/store.js';
@@ -498,7 +499,7 @@ describe('the waiting list', () => {
   test('a name on the waiting list is shown as it was typed, never read as markup', async () => {
     const rascal = person('<img src=x onerror=alert(1)>');
     await rascal.post(`/uker/${AUTUMN}/vent`);
-    assert.doesNotMatch(await (await kari.get('/')).text(), /<img/);
+    assert.doesNotMatch(await (await kari.get('/')).text(), /<img src=x/);
     assert.match(await (await kari.get('/')).text(), /<li>&lt;img src=x onerror=alert\(1\)&gt;<\/li>/);
 
     // Then the rascal has the week, and gives it up to Kari, who is told from whom.
@@ -506,7 +507,7 @@ describe('the waiting list', () => {
     await kari.post(`/uker/${AUTUMN}/vent`);
     await rascal.post(`/uker/${AUTUMN}/avbestill`);
     const page = await (await kari.get('/')).text();
-    assert.doesNotMatch(page, /<img/);
+    assert.doesNotMatch(page, /<img src=x/);
     assert.match(page, /da <span class="person">&lt;img src=x onerror=alert\(1\)&gt;<\/span> sa fra seg uka/);
     assert.match(page, /Fra ventelista, etter &lt;img src=x onerror=alert\(1\)&gt;/);
   });
@@ -571,7 +572,7 @@ describe('the draw', () => {
     assert.equal(book().bookings[EASTER].name, winner);
 
     assert.match(await card(visitor, EASTER), new RegExp(`${winner} vant trekningen Se trekningen$`));
-    assert.match(await card(person(winner), EASTER), /Du vant trekningen Si fra deg uka Legg i kalenderen din Se trekningen$/);
+    assert.match(await card(person(winner), EASTER), /Du vant trekningen! Si fra deg uka Legg i kalenderen din Se trekningen$/);
 
     const page = await (await visitor.get(`/trekning/${EASTER}`)).text();
     assert.match(page, new RegExp(`<p class="winner-name" data-winner-name>${winner}</p>`));
@@ -805,7 +806,7 @@ describe('the booking in your own calendar', () => {
     assert.equal((await ola.get(`/uker/${EASTER}/kalender.ics`)).status, 404);
 
     await visitor.post(`/trekning/${EASTER}/trekk`, { klar: 'ja' });
-    assert.match(await card(ola, EASTER), /Du vant trekningen Si fra deg uka Legg i kalenderen din Se trekningen$/);
+    assert.match(await card(ola, EASTER), /Du vant trekningen! Si fra deg uka Legg i kalenderen din Se trekningen$/);
     assert.match(await (await ola.get('/')).text(), link(EASTER));
 
     // The clock is set forward on 28 March 2027, the day after: both Saturdays are in winter time.
@@ -981,6 +982,93 @@ describe('a week from the waiting list, in your own calendar', () => {
   });
 });
 
+// Hytteboka looks and reads like Miles. The rules are Miles' brand kit; these hold the pages to the
+// parts of them a test can see.
+describe('Miles’ look and voice', () => {
+  const BRAND = fileURLToPath(new URL('../public/brand/', import.meta.url));
+  const USED = [
+    'miles.css', 'miles-logo-red.png', 'miles-logo-cream.png', 'miles-m-cream-on-red.png',
+    'fjell.png', 'feiring.png', 'sign-oisann.png',
+  ];
+  const pages = async () => ({
+    calendar: await (await kari.get('/')).text(),
+    manager: await (await kari.get('/kontorsjef')).text(),
+    draw: await (await visitor.get(`/trekning/${EASTER}`)).text(),
+    missing: await (await visitor.get('/finnes-ikke')).text(),
+  });
+
+  test('every page carries Miles’ logo, as a file from the brand kit and never as typed letters', async () => {
+    const { calendar, manager, draw, missing } = await pages();
+    const red = /<img class="logo" src="\/brand\/miles-logo-red\.png" alt="Miles" width="650" height="220">/;
+    for (const page of [calendar, manager, missing]) assert.match(page, red, 'the red logo on the light pages');
+    assert.match(draw, /<img class="logo" src="\/brand\/miles-logo-cream\.png" alt="Miles" width="1207" height="379">/,
+      'the cream logo on the burgundy stage');
+    for (const page of [calendar, manager, draw, missing]) {
+      assert.match(page, /<link rel="icon" type="image\/png" href="\/brand\/miles-m-cream-on-red\.png">/);
+      assert.doesNotMatch(page, /Havbris/);
+    }
+  });
+
+  test('the typefaces come from where Miles may show them from, and the tokens from the brand kit', async () => {
+    for (const page of Object.values(await pages())) {
+      assert.match(page, /<link rel="stylesheet" href="https:\/\/use\.typekit\.net\/npt7ifv\.css">/, 'Gelica, through Adobe’s kit');
+      assert.match(page, /<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com\/css2\?family=DM\+Sans:wght@400;500;600&amp;display=swap">/);
+      assert.ok(page.indexOf('/brand/miles.css') < page.indexOf('/stil.css'), 'the tokens load before the styles that use them');
+    }
+  });
+
+  test('the drawings on the pages are Miles’ own', async () => {
+    const { calendar, draw, missing } = await pages();
+    assert.match(calendar, /<img class="hero-art" src="\/brand\/fjell\.png" alt=""/);
+    assert.match(draw, /<span class="icon icon--feiring" aria-hidden="true"><\/span>/);
+    assert.match(missing, /<img class="oops-art" src="\/brand\/sign-oisann\.png" alt=""/);
+    for (const page of [calendar, draw, missing]) assert.doesNotMatch(page, /<svg/, 'no drawing of our own');
+  });
+
+  test('the brand files are served, and are the only ones kept: no font files', async () => {
+    for (const name of USED) {
+      const response = await visitor.get(`/brand/${name}`);
+      assert.equal(response.status, 200, name);
+      assert.match(response.headers.get('content-type'), name.endsWith('.css') ? /text\/css/ : /image\/png/, name);
+      assert.deepEqual(Buffer.from(await response.arrayBuffer()), readFileSync(BRAND + name), name);
+    }
+    assert.deepEqual(readdirSync(BRAND).sort(), [...USED].sort());
+    assert.equal((await visitor.get('/brand/miles-logo-white.png')).status, 404);
+    assert.equal((await visitor.get('/hytte.svg')).status, 404, 'our own cabin drawing is gone');
+  });
+
+  test('every colour in the stylesheet is a name from the brand’s tokens', () => {
+    const styles = readFileSync(fileURLToPath(new URL('../public/stil.css', import.meta.url)), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+    assert.deepEqual(styles.match(/#[0-9a-f]{3,8}\b|\b(?:rgb|hsl|oklch|color-mix)\(/gi) ?? [], []);
+
+    const tokens = readFileSync(BRAND + 'miles.css', 'utf8');
+    const named = new Set([...styles.matchAll(/var\((--[a-z0-9-]+)/g)].map((found) => found[1]));
+    const own = new Set([...styles.matchAll(/(--[a-z0-9-]+):/g)].map((found) => found[1]));
+    for (const name of named) {
+      assert.ok(own.has(name) || tokens.includes(`${name}:`), `${name} is not in the brand’s tokens`);
+    }
+  });
+
+  test('the calendar speaks as “vi” to “du”', async () => {
+    const { calendar, manager } = await pages();
+    assert.match(calendar, /<h1>Når vil du på <em>hytta\?<\/em><\/h1>/);
+    assert.match(calendar, /Ukene alle vil ha, trekker vi lodd om: meld deg på, så trekker vi vinneren mens hele kontoret ser på!/);
+    assert.match(calendar, /Hytteuka går fra lørdag til lørdag\. De som reiser, er ute til klokka 12\./);
+    assert.match(manager, /<h2>Ukene vi trekker lodd om<\/h2>/);
+    assert.match(manager, /Hva kaller vi uka\?/);
+  });
+
+  test('the winner is cheered', async () => {
+    await kari.post(`/uker/${EASTER}/meld-pa`);
+    await visitor.post(`/trekning/${EASTER}/trekk`, { klar: 'ja' });
+
+    const draw = await (await visitor.get(`/trekning/${EASTER}`)).text();
+    assert.match(draw, /<p class="winner-lead">Hytta går til<\/p>\s*<p class="winner-name" data-winner-name>Kari Hansen<\/p>\s*<p class="winner-cheer">Gratulerer, og god tur!<\/p>/);
+    assert.match(await card(kari, EASTER), /Du vant trekningen! /);
+  });
+});
+
 describe('what the server is careful about', () => {
   test('a name is shown as it was typed, never read as markup', async () => {
     const rascal = person('<img src=x onerror=alert(1)>');
@@ -989,14 +1077,21 @@ describe('what the server is careful about', () => {
 
     for (const path of ['/', '/kontorsjef', `/trekning/${EASTER}`]) {
       const page = await (await kari.get(path)).text();
-      assert.doesNotMatch(page, /<img/, path);
+      assert.doesNotMatch(page, /<img src=x/, path);
       assert.match(page, /&lt;img src=x onerror=alert\(1\)&gt;/, path);
     }
   });
 
-  test('pages may load their own files and nothing else', async () => {
+  test('pages may load their own files, and from elsewhere only the two typefaces', async () => {
     const response = await visitor.get('/');
-    assert.match(response.headers.get('content-security-policy'), /^default-src 'self';/);
+    assert.equal(response.headers.get('content-security-policy'), [
+      "default-src 'self'",
+      "style-src 'self' https://use.typekit.net https://p.typekit.net https://fonts.googleapis.com",
+      'font-src https://use.typekit.net https://fonts.gstatic.com',
+      "base-uri 'none'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+    ].join('; '));
     assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
   });
 
@@ -1012,12 +1107,11 @@ describe('what the server is careful about', () => {
     assert.equal(response.status, 413);
   });
 
-  test('serves its style, scripts and icon, and says so when a page is not there', async () => {
+  test('serves its style and scripts, and says so when a page is not there', async () => {
     for (const [path, type] of [
       ['/stil.css', /text\/css/],
       ['/trekning.js', /text\/javascript/],
       ['/hopp.js', /text\/javascript/],
-      ['/hytte.svg', /image\/svg\+xml/],
     ]) {
       const response = await visitor.get(path);
       assert.equal(response.status, 200, path);

@@ -1,4 +1,12 @@
-/* Hytteboka: snow, pine, a red cabin, and gold for the weeks a winner is drawn for. */
+/* Hytteboka in Miles' look.
+
+   Every colour, text step, space, corner and motion value here is a name from brand/miles.css,
+   the token file of Miles' brand kit, which the page loads before this file. What is written out
+   in this file is structure: grids, widths, and which name goes where.
+
+   The kit's UI theme is followed for the page, the surfaces and the text. Two things follow the
+   brand guide where the theme differs from it: buttons are pills, and they are burgundy rather
+   than red, since small text on red is too hard to read. */
 
 *,
 *::before,
@@ -10,28 +18,13 @@
 :root {
   color-scheme: light;
 
-  --snow: oklch(97.5% 0.012 85);
-  --paper: oklch(99.5% 0.004 85);
-  --ink: oklch(28% 0.04 265);
-  --muted: color-mix(in oklch, var(--ink) 70%, var(--snow));
-  --line: color-mix(in oklch, var(--ink) 16%, var(--snow));
-  --line-strong: color-mix(in oklch, var(--ink) 45%, var(--snow));
-  --pine: oklch(45% 0.09 160);
-  --cabin: oklch(55% 0.17 30);
-  --gold: oklch(82% 0.14 88);
-  --sky: oklch(92% 0.035 235);
-  --night: oklch(25% 0.06 265);
-
-  --title: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
-  --gap: clamp(1rem, 0.7rem + 1.2vw, 1.75rem);
-  --radius: 0.75rem;
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.5;
-  color: var(--ink);
-  background: var(--snow);
+  font-family: var(--font-ui);
+  font-weight: var(--weight-ui-regular);
+  font-size: var(--size-m);
+  line-height: var(--line-m);
+  letter-spacing: var(--letter-spacing-m);
+  color: var(--cte-text);
+  background: var(--cte-canvas);
 
   scrollbar-gutter: stable;
   text-wrap: pretty;
@@ -48,16 +41,41 @@ body {
   min-height: 100svh;
 }
 
+/* Titles speak in Gelica. */
 h1,
 h2 {
   margin: 0;
-  font-family: var(--serif);
-  line-height: 1.15;
+  font-family: var(--font-brand);
   text-wrap: balance;
 }
 
-h1 { font-size: var(--title); }
-h2 { font-size: 1.35rem; }
+h1 {
+  font-weight: var(--weight-brand-regular);
+  font-size: var(--size-xl);
+  line-height: var(--line-xl);
+  letter-spacing: var(--letter-spacing-xl);
+}
+
+/* The brand's emphasis: a word of the headline in red. Red text is always large. */
+h1 em {
+  font-style: normal;
+  color: var(--color-1);
+}
+
+h2 {
+  font-weight: var(--weight-brand-medium);
+  font-size: var(--size-l);
+  line-height: var(--line-l);
+  letter-spacing: var(--letter-spacing-l);
+}
+
+@media (min-width: 48rem) {
+  h1 {
+    font-size: var(--size-xxl);
+    line-height: var(--line-xxl);
+    letter-spacing: var(--letter-spacing-xxl);
+  }
+}
 
 p,
 ul,
@@ -65,23 +83,24 @@ ol {
   margin: 0;
 }
 
-svg {
+img {
   display: block;
   max-width: 100%;
   height: auto;
 }
 
+/* A field has an edge that can be seen, drawn as a shadow so it takes no room. */
 input,
 select {
+  padding-block: var(--space-s);
+  padding-inline: var(--space-m);
   font: inherit;
-  font-size: max(16px, 1rem);
-  min-block-size: 2.75rem;
-  padding-block: 0.4rem;
-  padding-inline: 0.75rem;
-  color: inherit;
-  background: white;
-  border: 2px solid var(--line-strong);
-  border-radius: 0.6rem;
+  font-size: max(16px, var(--size-m));
+  color: var(--neutral-10);
+  background: var(--neutral-1);
+  border: 0;
+  border-radius: var(--radius-s);
+  box-shadow: inset 0 0 0 1px var(--neutral-7);
 }
 
 button,
@@ -94,12 +113,24 @@ button {
   -webkit-user-select: none;
 }
 
-a { color: inherit; }
-a:active { color: var(--cabin); }
+/* A link keeps the colour of the text around it, and carries the red in its line. */
+a,
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--color-1);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+a:active,
+.link:active {
+  text-decoration-color: currentColor;
+}
 
 :focus-visible {
-  outline: max(2px, 0.08em) solid currentColor;
-  outline-offset: 0.25em;
+  outline: 2px solid var(--cte-focus);
+  outline-offset: 2px;
 }
 
 [hidden] { display: none !important; }
@@ -107,12 +138,11 @@ a:active { color: var(--cabin); }
 /* The frame of a page: one centred column with a gutter on each side. */
 
 .page {
-  --gutter: 1rem;
   display: grid;
   grid-template-columns:
-    minmax(var(--gutter), 1fr)
-    [content-start] min(100% - var(--gutter) * 2, 68rem) [content-end]
-    minmax(var(--gutter), 1fr);
+    minmax(var(--space-m), 1fr)
+    [content-start] min(100% - var(--space-m) * 2, 68rem) [content-end]
+    minmax(var(--space-m), 1fr);
   grid-template-rows: auto 1fr auto;
 }
 
@@ -121,96 +151,108 @@ a:active { color: var(--cabin); }
 .top {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem 1.5rem;
-  padding-block: 1rem;
+  align-items: center;
+  gap: var(--space-xs) var(--space-l);
+  padding-block: var(--space-l);
 }
 
 .brand {
-  font-family: var(--serif);
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-family: var(--font-brand);
+  font-weight: var(--weight-brand-medium);
+  font-size: var(--size-l);
+  line-height: var(--line-l);
+  letter-spacing: var(--letter-spacing-l);
   text-decoration: none;
-}
-
-.brand span {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.9rem;
-  font-weight: 400;
-  color: var(--muted);
-  margin-inline-start: 0.4rem;
 }
 
 .who {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.25rem 0.75rem;
+  gap: var(--space-xxs) var(--space-s);
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
+}
+
+/* Miles' wordmark, small in the top right corner, with air around it. */
+.logo {
+  flex: none;
+  inline-size: 5.5rem;
   margin-inline-start: auto;
+}
+
+/* On a narrow screen the logo keeps its corner, and who you are goes on a line of its own. */
+@media (max-width: 30rem) {
+  .who {
+    order: 1;
+    flex-basis: 100%;
+  }
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
-  padding-block-end: 3rem;
+  gap: var(--space-l);
+  padding-block-end: var(--space-xxl);
 }
 
+/* The ingress: Gelica, a step above the body text. */
 .lead {
-  max-inline-size: 60ch;
-  font-size: 1.1rem;
+  max-inline-size: 40ch;
+  font-family: var(--font-brand);
+  font-weight: var(--weight-brand-regular);
+  font-size: var(--size-l);
+  line-height: var(--line-l);
+  letter-spacing: var(--letter-spacing-l);
 }
 
 .bottom {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  padding-block: 1.5rem;
-  color: var(--muted);
-  border-block-start: 1px solid var(--line);
+  gap: var(--space-xs) var(--space-l);
+  padding-block: var(--space-l);
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
+  color: var(--cte-text-muted);
+  box-shadow: inset 0 1px 0 var(--neutral-4);
 }
 
 /* Buttons */
 
 .button {
-  --fill: var(--pine);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-block-size: 2.75rem;
-  padding-block: 0.4rem;
-  padding-inline: 1.15rem;
-  font: inherit;
-  font-weight: 600;
-  color: white;
+  gap: var(--space-xs);
+  padding-block: var(--space-s);
+  padding-inline: var(--space-l);
+  font-family: var(--font-ui);
+  font-weight: var(--weight-ui-medium);
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--tracking-l);
+  color: var(--neutral-1);
   text-decoration: none;
-  background: var(--fill);
-  border: 2px solid var(--fill);
-  border-radius: 99rem;
+  background: var(--color-2);
+  border: 0;
+  border-radius: var(--radius-full);
   cursor: pointer;
 }
 
 .button:active {
-  color: white;
-  transform: scale(0.97);
-}
-
-.button:focus-visible {
-  outline: 3px solid var(--fill);
-  outline-offset: 2px;
+  transform: translateY(var(--motion-press-distance));
 }
 
 .button--quiet {
-  color: var(--ink);
-  background: transparent;
-  border-color: var(--line-strong);
+  color: var(--neutral-10);
+  background: var(--neutral-3);
 }
 
-.button--quiet:active { color: var(--ink); }
-.button--quiet:focus-visible { outline-color: var(--ink); }
-
 .button:disabled {
-  opacity: 0.6;
+  color: var(--neutral-6);
+  background: var(--neutral-3);
   cursor: progress;
 }
 
@@ -218,8 +260,7 @@ a:active { color: var(--cabin); }
   position: relative;
   padding: 0;
   font: inherit;
-  color: inherit;
-  text-decoration: underline;
+  letter-spacing: inherit;
   background: none;
   border: 0;
   cursor: pointer;
@@ -232,28 +273,21 @@ a:active { color: var(--cabin); }
   inset: min(0px, (100% - 44px) / 2);
 }
 
-.link:active { color: var(--cabin); }
-
 @media (prefers-reduced-motion: no-preference) {
   .button {
     transition:
-      transform 160ms var(--ease-out),
-      background-color 160ms var(--ease-out);
+      transform var(--motion-duration) var(--motion-easing),
+      background-color var(--motion-duration) var(--motion-easing);
   }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .button:hover {
-    background: color-mix(in oklch, var(--fill), black 15%);
-  }
+  .button:hover { background: var(--neutral-8); }
+  .button--quiet:hover { background: var(--neutral-4); }
 
-  .button--quiet:hover {
-    background: color-mix(in oklch, var(--ink) 8%, transparent);
-  }
-
-  .link:hover,
-  a:hover {
-    text-decoration-thickness: 2px;
+  a:hover,
+  .link:hover {
+    text-decoration-thickness: 3px;
   }
 }
 
@@ -263,71 +297,67 @@ a:active { color: var(--cabin); }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem 2rem;
-  padding: var(--gap);
-  background: var(--sky);
-  border-radius: calc(var(--radius) * 2);
-}
-
-.hero-art {
-  flex-basis: 14rem;
-  flex-grow: 1;
-  max-inline-size: 22rem;
+  gap: var(--space-l) var(--space-xxl);
+  padding-block: var(--space-m) var(--space-l);
 }
 
 .hero-text {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-m);
   flex-basis: 0;
   flex-grow: 999;
-  min-inline-size: 55%;
+  min-inline-size: 60%;
 }
 
-.hero-text p {
-  max-inline-size: 52ch;
-  font-size: 1.1rem;
+.hero-rule {
+  max-inline-size: 60ch;
+  font-weight: var(--weight-ui-heavy);
 }
 
-.hero-text .hero-rule { font-weight: 600; }
-
-.art-far { fill: color-mix(in oklch, var(--night) 55%, var(--sky)); }
-.art-near { fill: color-mix(in oklch, var(--night) 30%, var(--sky)); }
-.art-snow { fill: var(--paper); }
-.art-tree { fill: var(--pine); }
-.art-wall { fill: var(--cabin); }
-.art-roof { fill: var(--night); }
-.art-window { fill: var(--gold); }
+/* One of Miles' own drawings beside the headline, no larger than it was drawn for. */
+.hero-art {
+  flex: none;
+  inline-size: 11rem;
+}
 
 .message {
-  padding-block: 0.75rem;
-  padding-inline: 1rem;
-  font-weight: 600;
-  background: color-mix(in oklch, var(--cabin) 12%, var(--paper));
-  border-inline-start: 0.3rem solid var(--cabin);
-  border-radius: 0.5rem;
+  padding-block: var(--space-s);
+  padding-inline: var(--space-m);
+  font-weight: var(--weight-ui-medium);
+  background: var(--error-transparent);
+  border-radius: var(--radius-m);
+}
+
+.notice {
+  padding-block: var(--space-s);
+  padding-inline: var(--space-m);
+  background: var(--color-3);
+  border-radius: var(--radius-m);
 }
 
 .who-are-you {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.25rem;
-  background: var(--paper);
-  border: 2px solid var(--pine);
-  border-radius: var(--radius);
+  gap: var(--space-xs);
+  padding: var(--space-l);
+  background: var(--cte-surface);
+  border-radius: var(--radius-l);
 }
 
 .who-are-you label {
-  font-family: var(--serif);
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-family: var(--font-brand);
+  font-weight: var(--weight-brand-medium);
+  font-size: var(--size-l);
+  line-height: var(--line-l);
+  letter-spacing: var(--letter-spacing-l);
 }
 
 .field-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: var(--space-s);
+  padding-block-start: var(--space-xs);
 }
 
 .field-row input {
@@ -341,156 +371,180 @@ a:active { color: var(--cabin); }
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1.5rem;
+  gap: var(--space-xs) var(--space-l);
   padding: 0;
   list-style: none;
-  color: var(--muted);
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
+  color: var(--cte-text-muted);
 }
 
 .legend li {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .legend li::before {
   content: "";
   flex: none;
-  inline-size: 0.9rem;
-  block-size: 0.9rem;
-  background: var(--state);
-  border-radius: 50%;
+  inline-size: var(--space-m);
+  block-size: var(--space-m);
+  background: var(--swatch);
+  border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 1px var(--neutral-5);
 }
 
-.legend--free,
-.week--free { --state: var(--pine); }
-
-.legend--booked,
-.week--booked { --state: color-mix(in oklch, var(--ink) 40%, var(--snow)); }
-
-.legend--draw,
-.week--draw,
-.week--drawn { --state: var(--gold); }
+.legend--free { --swatch: var(--cte-surface); }
+.legend--booked { --swatch: var(--cte-canvas); }
+.legend--draw { --swatch: var(--color-3); }
+.legend--mine { --swatch: var(--color-2); }
 
 .month {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-s);
 }
 
 .weeks {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-s);
   padding: 0;
   list-style: none;
 }
 
+/* A week is a card. A free week is cream and stands out from the page; a week that is taken
+   lies flat on it. A week a winner is drawn for is yellow, and your own is burgundy. */
 .week {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding-block: 0.8rem 1rem;
-  padding-inline: 1rem;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-block-start: 0.35rem solid var(--state);
-  border-radius: var(--radius);
-  scroll-margin-block: 1rem;
+  gap: var(--space-xs);
+  padding: var(--space-l);
+  background: var(--cte-surface);
+  border-radius: var(--radius-l);
+  scroll-margin-block: var(--space-m);
 }
 
 .week--booked {
-  color: var(--muted);
-  background: color-mix(in oklch, var(--ink) 5%, var(--snow));
+  color: var(--cte-text-muted);
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--neutral-4);
 }
 
-.week--draw,
-.week--drawn {
-  background: color-mix(in oklch, var(--gold) 16%, var(--paper));
-}
+.week--draw { background: var(--color-3); }
+.week--drawn { background: var(--color-3-transparent); }
+
+/* On yellow the softer text colour is too faint for small text, so the dates take the full one. */
+.week--draw .week-when span { color: inherit; }
 
 .week--mine {
-  color: var(--ink);
-  background: oklch(95% 0.045 160);
-  border-color: var(--pine);
+  color: var(--neutral-1);
+  background: var(--color-2);
+  box-shadow: none;
 }
 
 /* The week someone was just sent back to, after they changed something on it. */
 .week:target {
-  box-shadow: 0 0 0 0.25rem color-mix(in oklch, var(--cabin) 45%, transparent);
+  outline: 2px solid var(--color-1);
+  outline-offset: 2px;
 }
 
 .week-when {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  column-gap: 0.6rem;
+  column-gap: var(--space-s);
 }
 
 .week-when strong {
-  font-size: 1.2rem;
+  font-family: var(--font-brand);
+  font-weight: var(--weight-brand-medium);
+  font-size: var(--size-l);
+  line-height: var(--line-l);
+  letter-spacing: var(--letter-spacing-l);
   font-variant-numeric: tabular-nums;
 }
 
-.week-when span { color: var(--muted); }
-
-.week--free .week-status,
-.week--mine .week-status {
-  font-weight: 600;
-  color: var(--pine);
+.week-when span {
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
+  color: var(--cte-text-muted);
 }
+
+.week--free .week-status { font-weight: var(--weight-ui-heavy); }
 
 .week-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 1rem;
+  gap: var(--space-s) var(--space-m);
   margin-block-start: auto;
-  padding-block-start: 0.35rem;
+  padding-block-start: var(--space-xs);
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
 }
 
 .tag {
   align-self: start;
-  padding-inline: 0.6rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--ink);
-  background: color-mix(in oklch, var(--ink) 10%, transparent);
-  border-radius: 99rem;
+  padding-block: var(--space-xxs);
+  padding-inline: var(--space-s);
+  font-weight: var(--weight-ui-heavy);
+  font-size: var(--size-xs);
+  line-height: var(--line-xs);
+  letter-spacing: var(--letter-spacing-xs);
+  color: var(--neutral-10);
+  background: var(--neutral-3);
+  border-radius: var(--radius-full);
 }
 
-.tag--draw { background: var(--gold); }
+.tag--draw {
+  color: var(--neutral-1);
+  background: var(--color-2);
+}
 
-.person { font-weight: 600; }
+.person { font-weight: var(--weight-ui-heavy); }
 
-/* The waiting list of a week that is taken, and the word to someone who got a week from it */
+/* The waiting list of a week that is taken. */
 
-.week-note { color: var(--muted); }
-.week-note strong { color: var(--ink); }
+.week-note strong { color: var(--cte-text); }
 
 .queue {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding-block-start: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-  border-block-start: 1px solid var(--line);
+  gap: var(--space-xxs);
+  padding-block-start: var(--space-s);
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
+  box-shadow: inset 0 1px 0 var(--neutral-4);
 }
 
 .queue ol {
-  padding-inline-start: 1.6rem;
-  font-weight: 600;
+  padding-inline-start: var(--space-l);
+  font-weight: var(--weight-ui-heavy);
   font-variant-numeric: tabular-nums;
-  color: var(--ink);
+  color: var(--cte-text);
 }
 
-.notice {
-  padding-block: 0.75rem;
-  padding-inline: 1rem;
-  background: oklch(95% 0.045 160);
-  border-inline-start: 0.3rem solid var(--pine);
-  border-radius: 0.5rem;
+/* On your own week, which is dark, the same parts in light. */
+.week--mine .week-when span { color: var(--neutral-4); }
+.week--mine .week-note strong,
+.week--mine .queue ol { color: var(--neutral-1); }
+.week--mine .queue { box-shadow: inset 0 1px 0 var(--neutral-8); }
+.week--mine .tag { background: var(--neutral-8); color: var(--neutral-1); }
+.week--mine .tag--draw { background: var(--color-3); color: var(--color-2); }
+
+.week--mine .button--quiet {
+  color: var(--color-2);
+  background: var(--neutral-2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .week--mine .button--quiet:hover { background: var(--neutral-4); }
 }
 
 /* For the office manager */
@@ -498,11 +552,10 @@ a:active { color: var(--cabin); }
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  gap: var(--space-m);
+  padding: var(--space-l);
+  background: var(--cte-surface);
+  border-radius: var(--radius-l);
 }
 
 .draw-list {
@@ -515,200 +568,265 @@ a:active { color: var(--cabin); }
 .draw-list li {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding-block: 1rem;
-  border-block-start: 1px solid var(--line);
+  gap: var(--space-xs);
+  padding-block: var(--space-m);
+  box-shadow: inset 0 1px 0 var(--neutral-4);
 }
 
 .draw-list-title {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  column-gap: 0.75rem;
+  column-gap: var(--space-s);
 }
 
-.draw-list-title strong { font-size: 1.15rem; }
-.draw-list-title span { color: var(--muted); }
+.draw-list-title strong { font-weight: var(--weight-ui-heavy); }
+
+.draw-list-title span {
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
+  color: var(--cte-text-muted);
+}
 
 .row-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
+  gap: var(--space-xs) var(--space-s);
+  padding-block-start: var(--space-xs);
 }
 
 .fields {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: var(--space-xs);
   max-inline-size: 28rem;
 }
 
 .fields label {
-  font-weight: 600;
-  margin-block-start: 0.5rem;
+  margin-block-start: var(--space-xs);
+  font-weight: var(--weight-ui-medium);
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
 }
 
 .fields .button {
   align-self: start;
-  margin-block-start: 0.75rem;
+  margin-block-start: var(--space-s);
 }
 
 .optional {
-  font-weight: 400;
-  color: var(--muted);
+  font-weight: var(--weight-ui-regular);
+  color: var(--cte-text-muted);
 }
 
-/* The draw: a stage for the big screen */
+/* A page that is not there, or went wrong: one of Miles' drawings says it first. */
+
+.oops {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-l) var(--space-xxl);
+  padding-block: var(--space-l);
+}
+
+.oops-art {
+  flex: none;
+  inline-size: 12rem;
+}
+
+.oops-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: 55%;
+}
+
+/* The draw: a burgundy stage for the big screen */
 
 .stage {
   display: grid;
-  color: var(--snow);
-  background:
-    radial-gradient(120% 70% at 50% 0%, color-mix(in oklch, var(--night), oklch(60% 0.13 265) 35%), transparent 70%)
-    var(--night);
+  color: var(--neutral-1);
+  background: var(--color-2);
 }
 
 .draw {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  inline-size: min(100%, 72rem);
+  align-items: start;
+  gap: var(--space-m);
+  inline-size: min(100%, 68rem);
   margin-inline: auto;
-  padding-block: clamp(1.5rem, 1rem + 3vw, 4rem);
-  padding-inline: 1rem;
-  text-align: center;
+  padding-block: var(--space-l) var(--space-xxl);
+  padding-inline: var(--space-l);
 }
 
-.draw-kicker,
-.winner-lead {
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gold);
+.stage-top {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--space-l);
+  padding-block-end: var(--space-l);
 }
 
-.draw h1 {
-  font-size: clamp(2.5rem, 1.6rem + 5vw, 5.5rem);
-  line-height: 1.05;
+/* The label above the headline: small Gelica. It is yellow here, since small red does not read on burgundy. */
+.draw-kicker {
+  font-family: var(--font-brand);
+  font-weight: var(--weight-brand-regular);
+  color: var(--color-3);
 }
+
+.draw-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-m) var(--space-l);
+}
+
+/* One of Miles' own icons, in the colour of the text around it. */
+.icon {
+  flex: none;
+  display: block;
+  inline-size: 4.5rem;
+  aspect-ratio: 400 / 368;
+  background: currentColor;
+  -webkit-mask: var(--drawing) center / contain no-repeat;
+  mask: var(--drawing) center / contain no-repeat;
+}
+
+.icon--feiring { --drawing: url("/brand/feiring.png"); }
 
 .draw-when,
-.draw-empty {
-  font-size: 1.2rem;
-  color: color-mix(in oklch, var(--snow) 80%, var(--night));
+.draw-empty,
+.draw-count,
+.winner-when {
+  color: var(--neutral-4);
+}
+
+.draw-count,
+.winner-when {
+  font-size: var(--size-s);
+  line-height: var(--line-s);
+  letter-spacing: var(--letter-spacing-s);
 }
 
 .stage .message {
-  color: var(--snow);
-  text-align: start;
-  background: color-mix(in oklch, var(--cabin) 40%, transparent);
+  align-self: stretch;
+  color: var(--color-2);
+  background: var(--color-3);
 }
 
 .tickets {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
+  gap: var(--space-s);
   padding: 0;
-  margin-block: 1.5rem;
+  margin-block: var(--space-l);
   list-style: none;
 }
 
 .ticket {
-  padding-block: 0.7rem;
-  padding-inline: 1.3rem;
-  font-size: clamp(1.05rem, 0.9rem + 0.8vw, 1.6rem);
-  font-weight: 600;
-  color: var(--ink);
-  background: var(--snow);
-  border-inline-start: 0.4rem dotted var(--cabin);
-  border-radius: 0.5rem;
-  box-shadow: 0 0.25rem 0 color-mix(in oklch, var(--night), black 35%);
+  padding-block: var(--space-s);
+  padding-inline: var(--space-l);
+  font-weight: var(--weight-ui-heavy);
+  color: var(--color-2);
+  background: var(--neutral-2);
+  border-radius: var(--radius-m);
 }
 
+@media (min-width: 48rem) {
+  .ticket {
+    font-size: var(--size-l);
+    line-height: var(--line-l);
+    letter-spacing: var(--letter-spacing-l);
+  }
+}
+
+/* While the light hops, and when it has stopped, the tickets it is not on step back. */
 .is-drawing .ticket:not(.is-lit),
 .is-done .ticket:not(.is-winner) {
-  opacity: 0.45;
+  color: var(--neutral-4);
+  background: var(--neutral-8);
 }
 
 .ticket.is-lit,
 .ticket.is-winner {
-  background: var(--gold);
-  box-shadow:
-    0 0 0 0.25rem var(--paper),
-    0 0 2.5rem 0.5rem var(--gold);
-  transform: scale(1.12);
+  background: var(--color-3);
+  transform: scale(1.08);
 }
 
+/* The winner, on red: everything on red is set large. */
 .winner {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding-block: 1.5rem;
-  padding-inline: 2rem;
-  background: color-mix(in oklch, var(--gold) 14%, transparent);
-  border: 2px solid var(--gold);
-  border-radius: 1.25rem;
+  align-self: stretch;
+  gap: var(--space-xs);
+  padding: var(--space-xl);
+  font-family: var(--font-brand);
+  font-weight: var(--weight-brand-regular);
+  font-size: var(--size-l);
+  line-height: var(--line-l);
+  letter-spacing: var(--letter-spacing-l);
+  background: var(--color-1);
+  border-radius: var(--radius-xl);
 }
 
-.winner:focus-visible {
-  outline-color: var(--gold);
-}
+.winner:focus-visible { outline-color: var(--neutral-1); }
 
 .winner-name {
-  font-family: var(--serif);
-  font-size: clamp(2.5rem, 1.5rem + 6vw, 6rem);
-  font-weight: 700;
-  line-height: 1.05;
-}
-
-.winner-when {
-  color: color-mix(in oklch, var(--snow) 80%, var(--night));
+  font-weight: var(--weight-brand-medium);
+  font-size: var(--size-xxl);
+  line-height: var(--line-xxl);
+  letter-spacing: var(--letter-spacing-xxl);
 }
 
 .draw-form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.draw-count {
-  color: color-mix(in oklch, var(--snow) 80%, var(--night));
+  align-items: start;
+  gap: var(--space-m);
 }
 
 .ready {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  min-block-size: 2.75rem;
-  font-size: 1.1rem;
+  gap: var(--space-s);
+  min-block-size: var(--space-xxl);
   cursor: pointer;
 }
 
 .ready input {
   flex: none;
-  inline-size: 1.5rem;
-  block-size: 1.5rem;
-  min-block-size: 0;
+  inline-size: var(--space-l);
+  block-size: var(--space-l);
   padding: 0;
-  accent-color: var(--gold);
+  accent-color: var(--color-3);
 }
 
+/* The one button of the page, in yellow: the playful colour. */
 .button--draw {
-  --fill: var(--gold);
-  padding-block: 0.8rem;
-  padding-inline: 2.5rem;
-  font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);
-  color: var(--ink);
-  box-shadow: 0 0 2rem color-mix(in oklch, var(--gold) 50%, transparent);
+  padding-block: var(--space-m);
+  padding-inline: var(--space-xl);
+  font-size: var(--size-m);
+  line-height: var(--line-m);
+  letter-spacing: var(--letter-spacing-m);
+  color: var(--color-2);
+  background: var(--color-3);
 }
 
-.button--draw:active { color: var(--ink); }
+.button--draw:disabled {
+  color: var(--neutral-4);
+  background: var(--neutral-8);
+}
 
-.draw-back { margin-block-start: 1.5rem; }
+@media (hover: hover) and (pointer: fine) {
+  .button--draw:hover { background: var(--neutral-2); }
+}
+
+.draw-back { margin-block-start: var(--space-l); }
 
 .confetti {
   position: fixed;
@@ -721,11 +839,11 @@ a:active { color: var(--cabin); }
 
 @media (prefers-reduced-motion: no-preference) {
   .winner {
-    animation: arrive 700ms var(--ease-out) both;
+    animation: arrive var(--motion-large-duration) var(--motion-large-easing) both;
   }
 
   .ticket.is-winner {
-    animation: land 500ms var(--ease-out) both;
+    animation: land var(--motion-large-duration) var(--motion-large-easing) both;
   }
 }
 
@@ -737,6 +855,6 @@ a:active { color: var(--cabin); }
 }
 
 @keyframes land {
-  from { transform: scale(1.35); }
-  to { transform: scale(1.12); }
+  from { transform: scale(1.3); }
+  to { transform: scale(1.08); }
 }

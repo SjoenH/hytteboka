@@ -14,14 +14,14 @@ export function calendarPage({ weeks, today, name, wins, message, typedName }) {
   // Nobody is sent word when a week comes to them from the waiting list, so the page says it first of all.
   const handedOver = weeks.filter(({ booking }) => booking?.after && name && sameName(booking.name, name));
 
-  return page({ title: 'Når er hytta ledig?', name }, html`
+  return page({ title: 'Når vil du på hytta?', name }, html`
     <section class="hero">
-      ${cabinArt()}
       <div class="hero-text">
-        <h1>Når er hytta ledig?</h1>
-        <p>Book en ledig uke. Ukene alle vil ha, trekker vi lodd om: meld deg på, så trekkes vinneren mens kontoret ser på.</p>
+        <h1>Når vil du på <em>hytta?</em></h1>
+        <p class="lead">Finn en ledig uke og book den. Ukene alle vil ha, trekker vi lodd om: meld deg på, så trekker vi vinneren mens hele kontoret ser på!</p>
         <p class="hero-rule">Hytteuka går fra lørdag til lørdag. De som reiser, er ute til klokka ${CHANGEOVER_HOUR}.</p>
       </div>
+      <img class="hero-art" src="/brand/fjell.png" alt="" width="400" height="291">
     </section>
 
     ${alert(message)}
@@ -37,6 +37,7 @@ export function calendarPage({ weeks, today, name, wins, message, typedName }) {
       <li class="legend--free">Ledig</li>
       <li class="legend--booked">Opptatt</li>
       <li class="legend--draw">Trekning</li>
+      <li class="legend--mine">Din uke</li>
     </ul>
 
     ${months.map((month) => html`
@@ -82,7 +83,7 @@ function weekCard({ week, booking, draw, waiting }, { name, today, wins }) {
     if (entered) action = post('meld-av', 'Meld meg av', true);
     else if (name && !won) action = post('meld-pa', 'Meld meg på');
   } else {
-    status = mine ? 'Du vant trekningen' : html`<span class="person">${booking.name}</span> vant trekningen`;
+    status = mine ? 'Du vant trekningen!' : html`<span class="person">${booking.name}</span> vant trekningen`;
     if (mine) action = post('avbestill', 'Si fra deg uka', true);
   }
 
@@ -139,8 +140,14 @@ export function drawPage({ week, draw, booking, message }) {
 
   return page({ title: `Trekning om ${draw.label || Uke(week)}`, stage: true, script: '/trekning.js' }, html`
     <main class="draw${drawn ? ' is-done' : ''}" data-draw>
-      <p class="draw-kicker">Trekning om hytta</p>
-      <h1>${draw.label || Uke(week)}</h1>
+      <div class="stage-top">
+        <p class="draw-kicker">Trekning om hytta</p>
+        <img class="logo" src="/brand/miles-logo-cream.png" alt="Miles" width="1207" height="379">
+      </div>
+      <div class="draw-head">
+        <h1>${draw.label || Uke(week)}</h1>
+        <span class="icon icon--feiring" aria-hidden="true"></span>
+      </div>
       <p class="draw-when">${draw.label ? `${Uke(week)} · ` : ''}${formatRange(week)}</p>
       ${alert(message)}
 
@@ -153,8 +160,9 @@ export function drawPage({ week, draw, booking, message }) {
       <section class="winner" data-winner tabindex="-1"${drawn ? '' : html` hidden`}>
         <p class="winner-lead">Hytta går til</p>
         <p class="winner-name" data-winner-name>${booking?.name}</p>
-        ${drawn ? html`<p class="winner-when">Trukket ${formatMoment(booking.at)} blant ${countEntered(names.length)}.</p>` : ''}
+        <p class="winner-cheer">Gratulerer, og god tur!</p>
       </section>
+      ${drawn ? html`<p class="winner-when">Trukket ${formatMoment(booking.at)} blant ${countEntered(names.length)}.</p>` : ''}
 
       ${!drawn && names.length > 0 ? html`
         <form class="draw-form" method="post" action="/trekning/${week}/trekk" data-draw-form>
@@ -174,11 +182,11 @@ export function drawPage({ week, draw, booking, message }) {
 export function managerPage({ draws, freeWeeks, name, message }) {
   return page({ title: 'For kontorsjefen', name }, html`
     <h1>For kontorsjefen</h1>
-    <p class="lead">Her velger du hvilke uker det skal trekkes lodd om, og åpner trekningen når kontoret er samlet.</p>
+    <p class="lead">Her velger du hvilke uker vi trekker lodd om, og åpner trekningen når kontoret er samlet.</p>
     ${alert(message)}
 
     <section class="panel">
-      <h2>Ukene det trekkes lodd om</h2>
+      <h2>Ukene vi trekker lodd om</h2>
       ${draws.length === 0 ? html`<p>Ingen uker ennå.</p>` : html`
         <ul class="draw-list">
           ${draws.map(drawRow)}
@@ -192,7 +200,7 @@ export function managerPage({ draws, freeWeeks, name, message }) {
         <select id="uke" name="uke" required>
           ${freeWeeks.map((week) => html`<option value="${week}">${Uke(week)} · ${formatRange(week)}</option>`)}
         </select>
-        <label for="ukenavn">Hva kaller dere uka? <span class="optional">Kan stå tomt</span></label>
+        <label for="ukenavn">Hva kaller vi uka? <span class="optional">Kan stå tomt</span></label>
         <input id="ukenavn" name="navn" maxlength="40" placeholder="Høstferie">
         <button class="button">Trekk lodd om denne uka</button>
       </form>
@@ -223,9 +231,14 @@ function drawRow({ week, draw, booking }) {
 
 export function messagePage({ title, text, name }) {
   return page({ title, name }, html`
-    <h1>${title}</h1>
-    <p class="lead">${text}</p>
-    <p><a href="/">Til hytteboka</a></p>
+    <section class="oops">
+      <img class="oops-art" src="/brand/sign-oisann.png" alt="" width="422" height="564">
+      <div class="oops-text">
+        <h1>${title}</h1>
+        <p class="lead">${text}</p>
+        <p><a href="/">Til hytteboka</a></p>
+      </div>
+    </section>
   `);
 }
 
@@ -237,18 +250,21 @@ function page({ title, name, stage = false, script }, content) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>${title} · Hytteboka</title>
-<link rel="icon" href="/hytte.svg">
+<link rel="icon" type="image/png" href="/brand/miles-m-cream-on-red.png">
+${fonts()}
+<link rel="stylesheet" href="/brand/miles.css">
 <link rel="stylesheet" href="/stil.css">
 ${script ? html`<script type="module" src="${script}"></script>` : ''}
 </head>
 ${stage ? html`<body class="stage">${content}</body>` : html`<body class="page">
 <header class="top">
-  <a class="brand" href="/">Hytteboka <span>Havbris AS</span></a>
+  <a class="brand" href="/">Hytteboka</a>
   ${name ? html`
     <form class="who" method="post" action="/navn">
       <span>Du er <strong>${name}</strong></span>
       <button class="link">Bytt navn</button>
     </form>` : ''}
+  <img class="logo" src="/brand/miles-logo-red.png" alt="Miles" width="650" height="220">
 </header>
 <main class="content">${content}</main>
 <footer class="bottom"><a href="/">Kalenderen</a> <a href="/kontorsjef">For kontorsjefen</a></footer>
@@ -265,15 +281,13 @@ function countEntered(count) {
   return count === 0 ? 'Ingen påmeldt ennå' : `${count} påmeldt${count === 1 ? '' : 'e'}`;
 }
 
-function cabinArt() {
-  return html`
-    <svg class="hero-art" viewBox="0 0 320 150" role="img" aria-label="En rød hytte under to fjell">
-      <path class="art-far" d="M0 150 L70 52 L118 108 L176 24 L262 150 Z"/>
-      <path class="art-snow" d="M176 24 L201 61 L186 54 L176 66 L165 53 L153 58 Z M70 52 L86 71 L73 66 L62 74 L57 70 Z"/>
-      <path class="art-near" d="M150 150 L240 76 L320 132 L320 150 Z"/>
-      <path class="art-tree" d="M36 150 L50 104 L64 150 Z M270 150 L282 114 L294 150 Z M292 150 L302 122 L312 150 Z"/>
-      <path class="art-wall" d="M92 150 L92 116 L168 116 L168 150 Z"/>
-      <path class="art-roof" d="M82 118 L130 88 L178 118 Z"/>
-      <path class="art-window" d="M104 126 h16 v14 h-16 Z M140 126 h14 v24 h-14 Z"/>
-    </svg>`;
+/**
+ * Miles' two typefaces. Gelica may only be shown through Adobe's web kit for Miles, so it is
+ * fetched from there, and falls back to Georgia without a network. DM Sans is free; it comes from
+ * Google Fonts because this repository takes no font files.
+ */
+function fonts() {
+  return html`<link rel="stylesheet" href="https://use.typekit.net/npt7ifv.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&amp;display=swap">`;
 }

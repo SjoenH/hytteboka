@@ -69,7 +69,11 @@ function rest(milliseconds) {
 }
 
 function confetti() {
-  const colours = ['#e8b93c', '#c8432f', '#f7f3ea', '#3f8f6b', '#7fb6e6'];
+  // Miles' colours, read from the tokens the page has loaded: red, yellow, cream, and the page's own light.
+  const tokens = getComputedStyle(document.documentElement);
+  const colours = ['--color-1', '--color-3', '--color-4', '--neutral-1', '--miles-red-50']
+    .map((name) => tokens.getPropertyValue(name).trim())
+    .filter(Boolean);
   const canvas = document.createElement('canvas');
   canvas.className = 'confetti';
   canvas.setAttribute('aria-hidden', 'true');

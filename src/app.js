@@ -20,17 +20,35 @@ const FILES = {
   '/stil.css': 'text/css; charset=utf-8',
   '/trekning.js': 'text/javascript; charset=utf-8',
   '/hopp.js': 'text/javascript; charset=utf-8',
-  '/hytte.svg': 'image/svg+xml',
+  // Miles' brand: its tokens, logo, monogram and the drawings the pages place, as its brand kit delivers them.
+  '/brand/miles.css': 'text/css; charset=utf-8',
+  '/brand/miles-logo-red.png': 'image/png',
+  '/brand/miles-logo-cream.png': 'image/png',
+  '/brand/miles-m-cream-on-red.png': 'image/png',
+  '/brand/fjell.png': 'image/png',
+  '/brand/feiring.png': 'image/png',
+  '/brand/sign-oisann.png': 'image/png',
 };
 
 const WEEK_RULES = {
   book, avbestill: cancel, 'meld-pa': enter, 'meld-av': withdraw, vent: wait, 'ikke-vent': stopWaiting,
 };
 
-// The pages load their own files and nothing else, and run no script written into a page.
+// The pages load their own files and run no script written into a page. The one thing they fetch
+// from elsewhere is Miles' two typefaces: Gelica from Adobe's kit for Miles, the only place its
+// licence lets it be shown from, and DM Sans from Google Fonts.
+const FONT_STYLES = 'https://use.typekit.net https://p.typekit.net https://fonts.googleapis.com';
+const FONT_FILES = 'https://use.typekit.net https://fonts.gstatic.com';
 const HEADERS = {
   'Cache-Control': 'no-store',
-  'Content-Security-Policy': "default-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    `style-src 'self' ${FONT_STYLES}`,
+    `font-src ${FONT_FILES}`,
+    "base-uri 'none'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join('; '),
   'X-Content-Type-Options': 'nosniff',
 };
 

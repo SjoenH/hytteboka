@@ -94,7 +94,7 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
     Antar: at det er trekning, og hvor mange som er påmeldt, men ikke navnene. Etter trekningen står vinneren.
 
 24. **Skal teksten ha hilsen og underskrift?**
-    Antar: nei. Den er bare oversikten og regelen om lørdag klokka tolv. Resten skriver du selv.
+    Antar: en kort hilsen først og «God tur» til slutt, slik Miles skriver til kollegaer (punkt 48), men ingen underskrift. Den skriver du selv. Første versjon hadde ingen hilsen.
 
 25. **Hvor lager du den?**
     Antar: i Claude Code i dette prosjektet, på maskinen der boka ligger, med `/oversikt`.
@@ -157,6 +157,28 @@ Du ba om «en venteliste når uka er tatt». Hvordan den skal virke, sa du ikke,
 
 42. **Kan man angre?**
     Antar: ja. Den som venter, kan ta seg av ventelista når som helst, og de bak rykker fram. Den som setter seg på igjen, stiller bakerst.
+
+## Miles' utseende og stemme
+
+Hytteboka skal vises hos Miles, og Miles spurte: «Kan den se ut som oss?» Reglene er hentet fra Miles' merkevaremappe. Der mappa selv sier at noe er uavklart, står valget her.
+
+43. **Sidefarge og tekstfarge: merkevareguiden eller UI-temaet?**
+    Antar: UI-temaet, slik mappa sier for apper. Siden er nesten hvit (`#fffaf5`), kortene er krem, og teksten er mørk lilla. Guiden har krem side og burgunder tekst.
+
+44. **Hvordan skal knappene se ut?**
+    Antar: burgunder piller med lys tekst. UI-temaet har røde knapper med åtte piksler hjørne, men liten tekst på rødt er for vanskelig å lese, og guiden og miles.no bruker piller.
+
+45. **Hvor kommer skriftene fra?**
+    Antar: Gelica hentes fra Adobes fontpakke for Miles, som er eneste måte Miles har lov til å vise den på. DM Sans hentes fra Google Fonts, fordi dette åpne kodelageret ikke skal ha fontfiler. Uten nett vises Georgia og maskinens egen skrift. Siden henter altså to ting utenfra, selv om rammen var «uten sky».
+
+46. **Hvilke tegninger passer?**
+    Antar: fjellet med flagg ved overskriften, konfettirøret på trekningssiden og «Oisann»-skiltet når en side ikke finnes. Miles' sett har ingen hytte, og egne tegninger i samme stil er ikke lov, så hyttetegningen fra første versjon er tatt ut.
+
+47. **Hvor skal det røde brukes?**
+    Antar: i logoen, i ett ord i overskriften, i streken under lenker, og som flate bak vinneren i trekningen. Rød tekst er alltid stor.
+
+48. **Hvordan snakker Hytteboka?**
+    Antar: som «vi» til «du», varmt og tydelig. Overskriften spør «Når vil du på hytta?», vinneren får «Gratulerer, og god tur!», og kontorsjefens side sier «vi». Knapper og feilmeldinger er som før, fordi de alt var korte og klare.
 
 ## Ikke med i første versjon
 

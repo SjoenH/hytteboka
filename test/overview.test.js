@@ -28,10 +28,12 @@ function book() {
   };
 }
 
-describe('the overview Ragnhild sends out on Fridays', () => {
+describe('the overview sent out on Fridays', () => {
   test('says who has the cabin each of the next four weeks, ready to paste into an e-mail', () => {
     assert.equal(overviewText(book(), FRIDAY), [
-      'Hytta de neste fire ukene:',
+      'Hei!',
+      '',
+      'Her er hvem som har hytta de neste fire ukene:',
       '',
       'Uke 43, lør. 17. – lør. 24. oktober: Ola Nordmann',
       'Uke 44, lør. 24. – lør. 31. oktober: ledig',
@@ -39,7 +41,19 @@ describe('the overview Ragnhild sends out on Fridays', () => {
       'Uke 46, lør. 7. – lør. 14. november: trekning, ikke trukket ennå (3 påmeldte)',
       '',
       'Hytteuka går fra lørdag til lørdag. De som reiser, er ute til klokka 12.',
+      '',
+      'Ser du en ledig uke? Da er det bare å booke den i Hytteboka. God tur til alle som skal av gårde!',
     ].join('\n'));
+  });
+
+  test('invites people to book only when a week is free', () => {
+    const state = emptyState();
+    for (const week of ['2026-W43', '2026-W44', '2026-W45']) state.bookings[week] = { name: 'Ola Nordmann', at: AT };
+    state.draws['2026-W46'] = { label: '', entries: [] };
+    const text = overviewText(state, FRIDAY);
+
+    assert.doesNotMatch(text, /Ser du en ledig uke/);
+    assert.match(text, /\n\nGod tur til alle som skal av gårde!$/);
   });
 
   test('leaves out the week we are in, and the fifth week', () => {
