@@ -11,6 +11,8 @@ export function calendarPage({ weeks, today, name, wins, message, typedName }) {
     if (months.at(-1)?.title !== title) months.push({ title, weeks: [] });
     months.at(-1).weeks.push(entry);
   }
+  // Nobody is sent word when a week comes to them from the waiting list, so the page says it first of all.
+  const handedOver = weeks.filter(({ booking }) => booking?.after && name && sameName(booking.name, name));
 
   return page({ title: 'Når er hytta ledig?', name }, html`
     <section class="hero">
@@ -23,6 +25,12 @@ export function calendarPage({ weeks, today, name, wins, message, typedName }) {
     </section>
 
     ${alert(message)}
+    ${handedOver.map(({ week, booking }) => html`
+      <p class="notice">
+        Du har fått <a href="#${week}">${uke(week)}</a>, ${formatRange(week)}.
+        Du sto først på ventelista da <span class="person">${booking.after}</span> sa fra seg uka.
+        Passer den ikke lenger, sier du den fra deg.
+      </p>`)}
     ${name ? '' : nameForm(typedName)}
 
     <ul class="legend" aria-label="Fargene i kalenderen">
@@ -42,7 +50,7 @@ export function calendarPage({ weeks, today, name, wins, message, typedName }) {
   `);
 }
 
-function weekCard({ week, booking, draw }, { name, today, wins }) {
+function weekCard({ week, booking, draw, waiting }, { name, today, wins }) {
   const mine = Boolean(booking && name && sameName(booking.name, name));
   const state = draw ? (booking ? 'drawn' : 'draw') : booking ? 'booked' : 'free';
   const post = (action, label, quiet = false) => html`
@@ -52,12 +60,19 @@ function weekCard({ week, booking, draw }, { name, today, wins }) {
 
   let status;
   let action = '';
+  let queue = '';
   if (state === 'free') {
     status = 'Ledig';
     if (name) action = post('book', 'Book uka');
   } else if (state === 'booked') {
     status = mine ? 'Du har hytta' : html`Booket av <span class="person">${booking.name}</span>`;
     if (mine) action = post('avbestill', 'Si fra deg uka', true);
+
+    // A week that is taken has a waiting list. Where the reader stands on it, or -1.
+    const place = name ? waiting.findIndex((entry) => sameName(entry.name, name)) : -1;
+    if (place >= 0) action = post('ikke-vent', 'Ta meg av ventelista', true);
+    else if (name && !mine) action = post('vent', 'Sett meg på venteliste', true);
+    queue = waitingList({ booking, waiting }, { mine, place });
   } else if (state === 'draw') {
     const entered = Boolean(name && isEntered(draw, name));
     // Nobody wins two weeks in the same year: someone who has won one is told so, and is not offered the draw.
@@ -80,12 +95,29 @@ function weekCard({ week, booking, draw }, { name, today, wins }) {
       ${week === today ? html`<p class="tag">Denne uka</p>` : ''}
       ${draw ? html`<p class="tag tag--draw">${draw.label ? `Trekning · ${draw.label}` : 'Trekning'}</p>` : ''}
       <p class="week-status">${status}</p>
+      ${queue}
       ${action || draw ? html`
         <div class="week-actions">
           ${action}
           ${draw ? html`<a href="/trekning/${week}">Se trekningen</a>` : ''}
         </div>` : ''}
     </li>`;
+}
+
+/** What the card of a taken week says about its waiting list: who waits, in order, and what that means. */
+function waitingList({ booking, waiting }, { mine, place }) {
+  const myPlace = place === 0 ? 'Du står først på ventelista' : `Du er nummer ${place + 1} på ventelista`;
+  return html`
+      ${mine && booking.after ? html`<p class="week-note">Fra ventelista, etter ${booking.after}</p>` : ''}
+      ${place >= 0 ? html`<p class="week-note"><strong>${myPlace}</strong></p>` : ''}
+      ${waiting.length > 0 ? html`
+        <div class="queue">
+          <p>På venteliste:</p>
+          <ol>
+            ${waiting.map((entry) => html`<li>${entry.name}</li>`)}
+          </ol>
+          <p>${mine ? 'Sier du' : `Sier ${booking.name}`} fra seg uka, går den til ${place === 0 ? 'deg' : waiting[0].name}.</p>
+        </div>` : ''}`;
 }
 
 function nameForm(typedName) {

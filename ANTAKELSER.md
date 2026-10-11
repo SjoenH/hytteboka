@@ -85,6 +85,34 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
 21. **Hvor skal siden stå?**
     Antar: i dag på min maskin, for å vise deg. Hvor den skal stå for at alle førti skal nå den, avtaler vi etterpå.
 
+## Venteliste
+
+Du ba om «en venteliste når uka er tatt». Hvordan den skal virke, sa du ikke, så alt under er antatt.
+
+22. **Hvilke uker har venteliste?**
+    Antar: vanlige uker som noen har booket. En uke det er trukket lodd om, har ingen. Sier vinneren den fra seg, trekker du på nytt blant de andre som var påmeldt, som i punkt 16.
+
+23. **Hva skjer når den som har uka, sier den fra seg?**
+    Antar: uka går rett til den som har ventet lengst, uten at noen må si ja. De andre rykker én plass fram. Venter ingen, er uka ledig for alle, som før.
+
+24. **Hvordan får den som ventet, vite at uka er deres?**
+    Antar: på siden. Det står øverst i kalenderen når de åpner den, og på uka, med navnet på den som sa den fra seg. Det blir stående til uka er over. Siden sender ikke e-post, så ingen får vite noe uten å åpne den. Den som sier fra seg en uke, ser hvem den går til, og bør si fra til dem.
+
+25. **Hva om den som får uka, ikke kan likevel?**
+    Antar: de sier den fra seg, og da går den til neste på ventelista.
+
+26. **Hvem ser ventelista?**
+    Antar: alle, med navn og rekkefølge, slik alle ser hvem som har booket (punkt 20). Den som har uka, ser hvem den går til om de sier den fra seg. Siden det ikke er innlogging (punkt 18), kan hvem som helst sette en annen på ventelista, eller ta dem av.
+
+27. **Er det en grense for hvor mange ventelister én person kan stå på?**
+    Antar: nei, slik det heller ikke er en grense for hvor mange uker én person kan ha (punkt 5). Man kan vente på flere uker, og ha andre uker samtidig.
+
+28. **Hvor lenge kan man sette seg på venteliste?**
+    Antar: så lenge uka kan bookes, altså til den er over klokka tolv på lørdagen. Den som står først, kan dermed få en uke som alt er i gang.
+
+29. **Kan man angre?**
+    Antar: ja. Den som venter, kan ta seg av ventelista når som helst, og de bak rykker fram. Den som setter seg på igjen, stiller bakerst.
+
 ## Ikke med i første versjon
 
-Du har ikke bedt om dette, så det er ikke bygget: innlogging, varsel på e-post, venteliste på vanlige uker, regler for hvem som fikk hva i fjor, historikk over tidligere trekninger, og priser eller betaling.
+Du har ikke bedt om dette, så det er ikke bygget: innlogging, varsel på e-post, regler for hvem som fikk hva i fjor, historikk over tidligere trekninger, og priser eller betaling.

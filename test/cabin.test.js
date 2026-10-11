@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import {
   book, calendar, cancel, drawWinner, emptyState, enter, firstState, HORIZON, markDraw, readName, sameName,
-  unmarkDraw, winsOf, withdraw,
+  stopWaiting, unmarkDraw, wait, waitingFor, winsOf, withdraw,
 } from '../src/cabin.js';
 
 // The week the tests happen in: Saturday 10 to Saturday 17 October 2026.
@@ -41,7 +41,7 @@ describe('booking a week', () => {
   test('a week that is taken cannot be booked by someone else', () => {
     const state = emptyState();
     book(state, as('Ola Nordmann', AUTUMN));
-    refused(state, book, as('Kari Hansen', AUTUMN), /Uke 45 er allerede booket av Ola Nordmann/);
+    refused(state, book, as('Kari Hansen', AUTUMN), /Uke 45 er allerede booket av Ola Nordmann\. Du kan sette deg på venteliste\./);
     assert.equal(state.bookings[AUTUMN].name, 'Ola Nordmann');
   });
 
@@ -97,6 +97,159 @@ describe('giving a week up', () => {
 
   test('a week nobody has cannot be given up', () => {
     refused(emptyState(), cancel, as('Ola Nordmann', AUTUMN), /Uke 45 er ikke booket/);
+  });
+});
+
+// Ragnhild asked for a waiting list when the week is taken.
+describe('waiting for a week that is taken', () => {
+  const LATER = '2026-10-20T09:30:00.000Z';
+  const names = (state, week = AUTUMN) => waitingFor(state, week).map((entry) => entry.name);
+
+  /** A book where Ola has the autumn week, and those named wait for it in that order. */
+  function bookWithOlasWeek(...waiting) {
+    const state = emptyState();
+    assert.equal(book(state, as('Ola Nordmann', AUTUMN)).ok, true);
+    for (const name of waiting) assert.equal(wait(state, as(name, AUTUMN)).ok, true);
+    return state;
+  }
+
+  test('those who want a week that is taken wait for it, in the order they came', () => {
+    const state = bookWithOlasWeek();
+    assert.deepEqual(wait(state, as('Kari Hansen', AUTUMN)), { ok: true });
+    assert.deepEqual(wait(state, as('  Per   Olsen ', AUTUMN)), { ok: true });
+
+    assert.deepEqual(state.waiting[AUTUMN], [{ name: 'Kari Hansen', at: NOW }, { name: 'Per Olsen', at: NOW }]);
+    assert.equal(state.bookings[AUTUMN].name, 'Ola Nordmann', 'the week is still his');
+  });
+
+  test('one person has one place', () => {
+    const state = bookWithOlasWeek('Kari Hansen');
+    refused(state, wait, as('KARI HANSEN', AUTUMN), /Du står allerede på ventelista for uke 45/);
+  });
+
+  test('someone who waits and tries to book the week is told that they wait', () => {
+    const state = bookWithOlasWeek('Kari Hansen');
+    refused(state, book, as('Kari Hansen', AUTUMN), /Uke 45 er allerede booket av Ola Nordmann\. Du står på ventelista\./);
+  });
+
+  test('the one who has the week does not wait for it', () => {
+    refused(bookWithOlasWeek(), wait, as('ola nordmann', AUTUMN), /Du har allerede uke 45/);
+  });
+
+  test('nobody waits for a week that is free', () => {
+    refused(emptyState(), wait, as('Kari Hansen', AUTUMN), /Uke 45 er ledig\. Book den i stedet\./);
+  });
+
+  test('nobody waits for a week a winner is drawn for, before the draw or after it', () => {
+    const state = emptyState();
+    state.draws[EASTER] = { label: 'Påske', entries: [] };
+    refused(state, wait, as('Kari Hansen', EASTER), /Det trekkes lodd om uke 12\. Meld deg på trekningen i stedet\./);
+
+    enter(state, as('Ola Nordmann', EASTER));
+    drawWinner(state, { week: EASTER, today: TODAY, now: NOW });
+    refused(state, wait, as('Kari Hansen', EASTER), /Det er trukket lodd om uke 12\. Sier Ola Nordmann den fra seg/);
+  });
+
+  test('nobody waits without a name, or for a week that is over, too far ahead or not a week', () => {
+    const state = bookWithOlasWeek();
+    refused(state, wait, as('', AUTUMN), /Skriv navnet ditt/, 400);
+    refused(state, wait, as('Kari Hansen', '2026-W41'), /Uke 41 er over/);
+    refused(state, wait, as('Kari Hansen', '2027-W41'), /for langt fram/);
+    refused(state, wait, as('Kari Hansen', 'tull'), /finnes ikke/, 404);
+  });
+
+  test('someone who waits can stop, and those behind move up', () => {
+    const state = bookWithOlasWeek('Kari Hansen', 'Per Olsen', 'Nina Berg');
+    assert.deepEqual(stopWaiting(state, as('kari hansen', AUTUMN)), { ok: true });
+    assert.deepEqual(names(state), ['Per Olsen', 'Nina Berg']);
+
+    refused(state, stopWaiting, as('Kari Hansen', AUTUMN), /Du står ikke på ventelista for uke 45/);
+    refused(state, stopWaiting, as('Ola Nordmann', AUTUMN), /Du står ikke på ventelista for uke 45/);
+    refused(state, stopWaiting, as('', AUTUMN), /Skriv navnet ditt/, 400);
+  });
+
+  test('a week nobody waits for any more is not kept', () => {
+    const state = bookWithOlasWeek('Kari Hansen');
+    stopWaiting(state, as('Kari Hansen', AUTUMN));
+    assert.deepEqual(state.waiting, {});
+  });
+
+  test('when the week is given up, the one who has waited longest gets it', () => {
+    const state = bookWithOlasWeek('Kari Hansen', 'Per Olsen');
+    assert.deepEqual(cancel(state, { ...as('Ola Nordmann', AUTUMN), now: LATER }), { ok: true });
+
+    assert.deepEqual(state.bookings[AUTUMN], { name: 'Kari Hansen', at: LATER, after: 'Ola Nordmann' });
+    assert.deepEqual(names(state), ['Per Olsen'], 'the others keep their places');
+  });
+
+  test('the week goes from one to the next, and is free when nobody waits', () => {
+    const state = bookWithOlasWeek('Kari Hansen', 'Per Olsen');
+    cancel(state, as('Ola Nordmann', AUTUMN));
+    cancel(state, as('Kari Hansen', AUTUMN));
+    assert.deepEqual(state.bookings[AUTUMN], { name: 'Per Olsen', at: NOW, after: 'Kari Hansen' });
+    assert.deepEqual(state.waiting, {});
+
+    cancel(state, as('Per Olsen', AUTUMN));
+    assert.equal(state.bookings[AUTUMN], undefined);
+    assert.deepEqual(book(state, as('Nina Berg', AUTUMN)), { ok: true });
+    assert.deepEqual(state.bookings[AUTUMN], { name: 'Nina Berg', at: NOW }, 'a week that was free was not waited for');
+  });
+
+  test('someone who waits cannot give the week up for the one who has it', () => {
+    const state = bookWithOlasWeek('Kari Hansen');
+    refused(state, cancel, as('Kari Hansen', AUTUMN), /booket av Ola Nordmann, ikke av deg/, 403);
+  });
+
+  test('the one who gave the week up can wait for it, behind the others', () => {
+    const state = bookWithOlasWeek('Kari Hansen', 'Per Olsen');
+    cancel(state, as('Ola Nordmann', AUTUMN));
+    assert.equal(wait(state, as('Ola Nordmann', AUTUMN)).ok, true);
+    assert.deepEqual(names(state), ['Per Olsen', 'Ola Nordmann']);
+  });
+
+  test('someone can wait for several weeks, and for one while they have another', () => {
+    const state = bookWithOlasWeek('Kari Hansen');
+    book(state, as('Ola Nordmann', '2026-W46'));
+    book(state, as('Kari Hansen', '2026-W47'));
+    assert.equal(wait(state, as('Kari Hansen', '2026-W46')).ok, true);
+    assert.deepEqual(Object.keys(state.waiting), [AUTUMN, '2026-W46']);
+  });
+
+  test('a week someone waits for cannot be set up for a draw', () => {
+    const state = bookWithOlasWeek('Kari Hansen');
+    refused(state, markDraw, { week: AUTUMN, label: '', today: TODAY }, /allerede booket av Ola Nordmann/);
+  });
+
+  test('a week that was won is still drawn again when it is given up', () => {
+    const state = emptyState();
+    state.draws[EASTER] = { label: 'Påske', entries: [] };
+    for (const name of ['Ola Nordmann', 'Kari Hansen']) enter(state, as(name, EASTER));
+    drawWinner(state, { week: EASTER, today: TODAY, now: NOW, pick: () => 0 });
+
+    cancel(state, as('Ola Nordmann', EASTER));
+    assert.equal(state.bookings[EASTER], undefined, 'it goes to nobody before the next draw');
+  });
+
+  test('the calendar has those who wait with each week', () => {
+    const state = bookWithOlasWeek('Kari Hansen');
+    const weeks = calendar(state, TODAY);
+    assert.deepEqual(weeks.find((entry) => entry.week === AUTUMN).waiting, [{ name: 'Kari Hansen', at: NOW }]);
+    assert.deepEqual(weeks.find((entry) => entry.week === '2026-W46').waiting, []);
+  });
+
+  test('a book from before the waiting list works as it is', () => {
+    const state = { bookings: { [AUTUMN]: { name: 'Ola Nordmann', at: NOW } }, draws: {} };
+    assert.deepEqual(calendar(state, TODAY).find((entry) => entry.week === AUTUMN).waiting, []);
+    refused(state, stopWaiting, as('Kari Hansen', AUTUMN), /Du står ikke på ventelista/);
+
+    assert.equal(wait(state, as('Kari Hansen', AUTUMN)).ok, true);
+    assert.deepEqual(names(state), ['Kari Hansen']);
+    assert.equal(cancel(state, as('Ola Nordmann', AUTUMN)).ok, true);
+    assert.equal(state.bookings[AUTUMN].name, 'Kari Hansen');
+
+    const older = { bookings: { [AUTUMN]: { name: 'Ola Nordmann', at: NOW } }, draws: {} };
+    assert.equal(cancel(older, as('Ola Nordmann', AUTUMN)).ok, true);
+    assert.deepEqual(older, { bookings: {}, draws: {} }, 'giving a week up adds nothing to it');
   });
 });
 
@@ -404,7 +557,7 @@ describe('the book as it is shown', () => {
     assert.equal(weeks.length, HORIZON);
     assert.equal(weeks[0].week, TODAY);
     assert.equal(weeks.at(-1).week, '2027-W40');
-    assert.deepEqual(weeks[0], { week: TODAY, booking: null, draw: null });
+    assert.deepEqual(weeks[0], { week: TODAY, booking: null, draw: null, waiting: [] });
     assert.equal(weeks.find((entry) => entry.week === AUTUMN).booking.name, 'Ola Nordmann');
     assert.equal(weeks.find((entry) => entry.week === EASTER).draw.label, 'Påske');
   });
