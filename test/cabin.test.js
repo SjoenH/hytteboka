@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import {
   book, calendar, cancel, drawWinner, emptyState, enter, firstState, HORIZON, markDraw, readName, sameName,
-  unmarkDraw, withdraw,
+  unmarkDraw, winsOf, withdraw,
 } from '../src/cabin.js';
 
 // The week the tests happen in: Saturday 10 to Saturday 17 October 2026.
@@ -213,6 +213,144 @@ describe('drawing the winner', () => {
     assert.equal(enter(state, as('Nina Berg', EASTER)).ok, true, 'the draw is open again');
     assert.deepEqual(draw(state, () => 2), { ok: true, winner: 2, entries: ['Kari Hansen', 'Per Olsen', 'Nina Berg'] });
     assert.equal(state.bookings[EASTER].name, 'Nina Berg');
+  });
+});
+
+// Ragnhild's rule: whoever wins a draw cannot win another week the same year.
+describe('nobody wins two weeks in the same year', () => {
+  const WINTER = '2027-W08';
+  const people = ['Ola Nordmann', 'Kari Hansen', 'Per Olsen'];
+  const draw = (state, week, pick) => drawWinner(state, { week, today: TODAY, now: NOW, pick });
+  const names = (state, week) => state.draws[week].entries.map((entry) => entry.name);
+
+  /** A book with a draw for each of the weeks given, and the same people entered in all of them. */
+  function bookWithDraws(weeks, entered = people) {
+    const state = emptyState();
+    for (const week of weeks) {
+      state.draws[week] = { label: '', entries: [] };
+      for (const name of entered) assert.equal(enter(state, as(name, week)).ok, true);
+    }
+    return state;
+  }
+
+  test('people can be in several draws until one of them is drawn', () => {
+    const state = bookWithDraws([WINTER, EASTER]);
+    assert.deepEqual(names(state, WINTER), people);
+    assert.deepEqual(names(state, EASTER), people);
+  });
+
+  test('the one who wins has no ticket left in the other draws of that year', () => {
+    const state = bookWithDraws([WINTER, EASTER]);
+    draw(state, WINTER, () => 1);
+
+    assert.equal(state.bookings[WINTER].name, 'Kari Hansen');
+    assert.deepEqual(names(state, EASTER), ['Ola Nordmann', 'Per Olsen']);
+    assert.deepEqual(names(state, WINTER), people, 'the tickets of the draw that was won stay');
+  });
+
+  test('the next draw that year is among the others', () => {
+    const state = bookWithDraws([WINTER, EASTER]);
+    draw(state, WINTER, () => 1);
+    const asked = [];
+    const answer = draw(state, EASTER, (count) => {
+      asked.push(count);
+      return 1;
+    });
+
+    assert.deepEqual(asked, [2]);
+    assert.deepEqual(answer, { ok: true, winner: 1, entries: ['Ola Nordmann', 'Per Olsen'] });
+    assert.equal(state.bookings[EASTER].name, 'Per Olsen');
+  });
+
+  test('someone who has won cannot enter another draw that year', () => {
+    const state = bookWithDraws([WINTER, EASTER]);
+    draw(state, WINTER, () => 1);
+    refused(state, enter, as('kari hansen', EASTER), /Du vant uke 8, og kan ikke vinne en uke til i 2027\./);
+  });
+
+  test('the same year means the year the weeks are in, whenever they are drawn', () => {
+    // Christmas 2026 and the winter break 2027 are both drawn in October 2026, and are not the same year.
+    const state = bookWithDraws(['2026-W52', WINTER, EASTER]);
+    draw(state, '2026-W52', () => 1);
+
+    assert.deepEqual(names(state, WINTER), people, 'a ticket for a week in another year is left alone');
+    assert.equal(draw(state, WINTER, () => 1).ok, true);
+    assert.equal(state.bookings[WINTER].name, 'Kari Hansen', 'she can win a week in 2027 too');
+    assert.deepEqual(winsOf(state, 'Kari Hansen'), { 2026: '2026-W52', 2027: WINTER });
+  });
+
+  test('a week around New Year counts for the year most of its nights fall in', () => {
+    // 26 December 2026 to 2 January 2027 counts for 2026, and 2 to 9 January 2027 for 2027.
+    const state = bookWithDraws(['2026-W53', '2027-W01', WINTER], ['Ola Nordmann']);
+    state.draws[WINTER].entries = [];
+    state.draws['2027-W01'].entries = [];
+    draw(state, '2026-W53', () => 0);
+    assert.equal(enter(state, as('Ola Nordmann', '2027-W01')).ok, true, 'the week after New Year is another year');
+
+    draw(state, '2027-W01', () => 0);
+    refused(state, enter, as('Ola Nordmann', WINTER), /Du vant uke 1, og kan ikke vinne en uke til i 2027\./);
+  });
+
+  test('the year is the one the nights are in, also when the name of the week says the next', () => {
+    // "2026-W01" runs from 27 December 2025 to 3 January 2026: five of its seven nights are in 2025.
+    const then = (name, week) => ({ name, week, today: '2025-W45', now: '2025-11-05T08:00:00.000Z' });
+    const state = emptyState();
+    for (const week of ['2025-W50', '2026-W01', '2026-W08']) state.draws[week] = { label: '', entries: [] };
+
+    enter(state, then('Ola Nordmann', '2026-W01'));
+    drawWinner(state, { ...then('', '2026-W01'), pick: () => 0 });
+    assert.deepEqual(winsOf(state, 'Ola Nordmann'), { 2025: '2026-W01' });
+
+    refused(state, enter, then('Ola Nordmann', '2025-W50'), /Du vant uke 1, og kan ikke vinne en uke til i 2025\./);
+    assert.equal(enter(state, then('Ola Nordmann', '2026-W08')).ok, true, 'the winter break of 2026 is another year');
+  });
+
+  test('a winner who gives the week up has won nothing that year, and can enter and win again', () => {
+    const state = bookWithDraws([WINTER, EASTER]);
+    draw(state, WINTER, () => 1);
+    assert.equal(cancel(state, as('Kari Hansen', WINTER)).ok, true);
+
+    assert.deepEqual(winsOf(state, 'Kari Hansen'), {});
+    assert.equal(enter(state, as('Kari Hansen', EASTER)).ok, true);
+    assert.deepEqual(names(state, EASTER), ['Ola Nordmann', 'Per Olsen', 'Kari Hansen']);
+    assert.equal(draw(state, EASTER, () => 2).ok, true);
+    assert.equal(state.bookings[EASTER].name, 'Kari Hansen');
+  });
+
+  test('the rule is about draws: a winner can book ordinary weeks, and someone with ordinary weeks can win', () => {
+    const state = bookWithDraws([WINTER, EASTER]);
+    assert.equal(book(state, as('Kari Hansen', '2027-W05')).ok, true);
+    assert.equal(draw(state, WINTER, () => 1).ok, true);
+    assert.equal(state.bookings[WINTER].name, 'Kari Hansen');
+    assert.equal(book(state, as('Kari Hansen', '2027-W20')).ok, true);
+    assert.deepEqual(winsOf(state, 'Kari Hansen'), { 2027: WINTER });
+  });
+
+  test('a draw never picks someone who has won that year, whatever an older book holds', () => {
+    // A book from before the rule could have a winner still entered elsewhere.
+    const state = bookWithDraws([WINTER, EASTER]);
+    state.bookings[WINTER] = { name: 'Kari Hansen', at: NOW };
+    assert.deepEqual(names(state, EASTER), people);
+
+    const answer = draw(state, EASTER, () => 1);
+    assert.deepEqual(answer, { ok: true, winner: 1, entries: ['Ola Nordmann', 'Per Olsen'] });
+    assert.equal(state.bookings[EASTER].name, 'Per Olsen');
+    assert.deepEqual(names(state, EASTER), ['Ola Nordmann', 'Per Olsen'], 'the draw was among these two');
+  });
+
+  test('left to itself, two draws in a year never go to the same person', () => {
+    for (let round = 0; round < 300; round += 1) {
+      const state = bookWithDraws([WINTER, EASTER]);
+      drawWinner(state, { week: WINTER, today: TODAY, now: NOW });
+      drawWinner(state, { week: EASTER, today: TODAY, now: NOW });
+      assert.notEqual(state.bookings[EASTER].name, state.bookings[WINTER].name);
+    }
+  });
+
+  test('there is nothing to draw when everyone entered has won that year already', () => {
+    const state = bookWithDraws([WINTER, EASTER], ['Kari Hansen']);
+    state.bookings[WINTER] = { name: 'Kari Hansen', at: NOW };
+    refused(state, drawWinner, { week: EASTER, today: TODAY, now: NOW }, /har alt vunnet en uke i 2027/);
   });
 });
 

@@ -405,6 +405,85 @@ describe('the draw', () => {
   });
 });
 
+// Ragnhild's rule: whoever wins a draw cannot win another week the same year.
+describe('nobody wins two weeks in the same year', () => {
+  const WINTER = '2027-W08';
+  const everyone = ['Ola Nordmann', 'Kari Hansen', 'Per Olsen'];
+  const enterBoth = async () => {
+    for (const name of everyone) {
+      await person(name).post(`/uker/${WINTER}/meld-pa`);
+      await person(name).post(`/uker/${EASTER}/meld-pa`);
+    }
+  };
+  const draw = async (week) => {
+    const response = await visitor.post(`/trekning/${week}/trekk`, { klar: 'ja' }, { Accept: 'application/json' });
+    const drawn = await response.json();
+    return drawn.entries[drawn.winner];
+  };
+  const tickets = async (week) => {
+    const page = await (await visitor.get(`/trekning/${week}`)).text();
+    return [...page.matchAll(/data-ticket>([^<]*)</g)].map((found) => found[1]);
+  };
+
+  test('the draw page says the rule', async () => {
+    await enterBoth();
+    assert.match(await (await visitor.get(`/trekning/${EASTER}`)).text(), /3 lodd i hatten\. Ingen vinner to uker samme år\./);
+  });
+
+  test('whoever wins the winter break is out of the Easter draw, which goes to one of the others', async () => {
+    await enterBoth();
+    assert.deepEqual(await tickets(EASTER), everyone);
+
+    const winner = await draw(WINTER);
+    const others = everyone.filter((name) => name !== winner);
+    assert.deepEqual(await tickets(EASTER), others);
+    assert.match(await card(person(others[0]), EASTER), /2 påmeldte Du er med i trekningen Meld meg av Se trekningen$/);
+
+    assert.ok(others.includes(await draw(EASTER)));
+    assert.notEqual(book().bookings[EASTER].name, book().bookings[WINTER].name);
+  });
+
+  test('the winner is told why, and is not offered the other draw that year', async () => {
+    await enterBoth();
+    const winner = person(await draw(WINTER));
+
+    assert.equal(
+      await card(winner, EASTER),
+      'Uke 12 lør. 20. – lør. 27. mars Trekning · Påske 2 påmeldte Du vant uke 8, og kan ikke vinne en uke til i 2027 Se trekningen',
+    );
+    const again = await winner.post(`/uker/${EASTER}/meld-pa`);
+    assert.equal(again.status, 409);
+    assert.match(await again.text(), /role="alert">Du vant uke 8, og kan ikke vinne en uke til i 2027\./);
+    assert.equal(book().draws[EASTER].entries.length, 2);
+  });
+
+  test('a draw for a week in another year is still open to the winner', async () => {
+    await visitor.post('/kontorsjef/trekningsuker', { uke: '2026-W52', navn: 'Jul' });
+    await enterBoth();
+    const winner = person(await draw(WINTER));
+
+    assert.match(await card(winner, '2026-W52'), /Trekning · Jul Ingen påmeldt ennå Meld meg på Se trekningen$/);
+    assert.equal((await winner.post('/uker/2026-W52/meld-pa')).status, 303);
+  });
+
+  test('a winner who gives the week up can enter the other draw again', async () => {
+    await enterBoth();
+    const winner = person(await draw(WINTER));
+    assert.equal((await winner.post(`/uker/${WINTER}/avbestill`)).status, 303);
+
+    assert.match(await card(winner, EASTER), /2 påmeldte Meld meg på Se trekningen$/);
+    assert.equal((await winner.post(`/uker/${EASTER}/meld-pa`)).status, 303);
+    assert.match(await card(winner, EASTER), /3 påmeldte Du er med i trekningen Meld meg av Se trekningen$/);
+  });
+
+  test('the winner can still book an ordinary week', async () => {
+    await enterBoth();
+    const winner = person(await draw(WINTER));
+    assert.equal((await winner.post(`/uker/${AUTUMN}/book`)).status, 303);
+    assert.equal((await winner.post('/uker/2027-W20/book')).status, 303);
+  });
+});
+
 describe('for the office manager', () => {
   test('lists the draws, with who has entered', async () => {
     await ola.post(`/uker/${EASTER}/meld-pa`);

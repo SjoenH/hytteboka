@@ -8,12 +8,13 @@
 // A week is a week on the cabin, Saturday to Saturday: `weeks.js` says which days that is.
 // A week has at most one booking, since bookings are kept by week.
 // A draw is done when its week has a booking: that booking is the winner, and its `at` is when it was drawn.
+// Nobody wins two weeks in the same year. The year is the one the week is in (`yearOf`), whenever it is drawn.
 //
 // Each rule takes the state and what someone wants, and either changes the state and answers
 // { ok: true }, or leaves it as it was and answers { ok: false, status, message } with words for the person.
 
 import { randomInt } from 'node:crypto';
-import { addWeeks, currentWeek, easterWeek, isWeekId, weekNumber, weeksFrom } from './weeks.js';
+import { addWeeks, currentWeek, easterWeek, isWeekId, weekNumber, weeksFrom, yearOf } from './weeks.js';
 
 /** How many weeks are shown and can be booked, counting the one we are in. */
 export const HORIZON = 52;
@@ -51,6 +52,19 @@ export function sameName(a, b) {
 
 export function isEntered(draw, name) {
   return draw.entries.some((entry) => sameName(entry.name, name));
+}
+
+/**
+ * The weeks someone has won, by the year each counts for: { 2027: "2027-W08" }.
+ * A week is won while they have it. Someone who gave their week up has won nothing that year.
+ */
+export function winsOf(state, name) {
+  const wins = {};
+  for (const week of Object.keys(state.draws)) {
+    const booking = state.bookings[week];
+    if (booking && sameName(booking.name, name)) wins[yearOf(week)] = week;
+  }
+  return wins;
 }
 
 /** The weeks from this one on, each with what stands in the book about it. */
@@ -103,6 +117,8 @@ export function enter(state, { week, name, today, now }) {
 
   const draw = state.draws[week];
   if (isEntered(draw, name)) return refuse(`Du er allerede påmeldt trekningen om ${uke(week)}.`);
+  const won = winsOf(state, name)[yearOf(week)];
+  if (won) return refuse(`Du vant ${uke(won)}, og kan ikke vinne en uke til i ${yearOf(week)}.`);
 
   draw.entries.push({ name: readName(name), at: now });
   return done();
@@ -122,17 +138,35 @@ export function withdraw(state, { week, name, today }) {
 /**
  * Draws the winner: one of those entered, each with the same chance, and books the week for them.
  * `pick(count)` answers a whole number from 0 up to, not including, count.
+ *
+ * Whoever has won another week the same year is not in the draw. Their ticket was taken out when
+ * they won, so this only finds any in a book from before that rule; it is asked here all the same,
+ * since this is where a second week would be won.
  */
 export function drawWinner(state, { week, today, now, pick = randomInt }) {
   const problem = weekProblem(week, today) ?? drawProblem(state, week);
   if (problem) return problem;
 
-  const { entries } = state.draws[week];
-  if (entries.length === 0) return refuse(`Ingen har meldt seg på trekningen om ${uke(week)} ennå.`);
+  const draw = state.draws[week];
+  const year = yearOf(week);
+  if (draw.entries.length === 0) return refuse(`Ingen har meldt seg på trekningen om ${uke(week)} ennå.`);
+  const tickets = draw.entries.filter((entry) => !winsOf(state, entry.name)[year]);
+  if (tickets.length === 0) {
+    return refuse(`Alle som er påmeldt trekningen om ${uke(week)}, har alt vunnet en uke i ${year}.`);
+  }
 
-  const winner = pick(entries.length);
-  state.bookings[week] = { name: entries[winner].name, at: now };
-  return done({ winner, entries: entries.map((entry) => entry.name) });
+  const winner = pick(tickets.length);
+  const name = tickets[winner].name;
+  draw.entries = tickets;
+  state.bookings[week] = { name, at: now };
+
+  // The winner's tickets in the other draws of that year are taken out, so every ticket shown can win.
+  for (const [other, { entries }] of Object.entries(state.draws)) {
+    if (other === week || yearOf(other) !== year || state.bookings[other]) continue;
+    state.draws[other].entries = entries.filter((entry) => !sameName(entry.name, name));
+  }
+
+  return done({ winner, entries: tickets.map((entry) => entry.name) });
 }
 
 export function markDraw(state, { week, label, today }) {

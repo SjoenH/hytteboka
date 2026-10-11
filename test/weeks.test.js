@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   addWeeks, currentWeek, easterSunday, easterWeek, endOf, formatMoment, formatRange, isWeekId, monthOf, startOf,
-  weekNumber, weeksFrom,
+  weekNumber, weeksFrom, yearOf,
 } from '../src/weeks.js';
 
 const SATURDAY = 6;
@@ -114,6 +114,16 @@ test('a week is listed under the month most of its nights fall in', () => {
   assert.equal(monthOf('2027-W14'), 'April 2027');
   assert.equal(monthOf('2026-W49'), 'Desember 2026', 'three nights in November, four in December');
   assert.equal(monthOf('2026-W53'), 'Desember 2026');
+});
+
+test('a week counts for the year most of its nights fall in', () => {
+  assert.equal(yearOf('2027-W08'), 2027);
+  assert.equal(yearOf('2027-W12'), 2027);
+  assert.equal(yearOf('2026-W53'), 2026, '26 December to 2 January: six nights in 2026');
+  assert.equal(yearOf('2027-W01'), 2027, '2 to 9 January');
+  assert.equal(yearOf('2026-W01'), 2025, '27 December 2025 to 3 January 2026: five nights in 2025');
+  assert.equal(yearOf('2025-W01'), 2024, '28 December 2024 to 4 January 2025: four nights in 2024');
+  assert.equal(yearOf('2024-W01'), 2024, '30 December 2023 to 6 January 2024: five nights in 2024');
 });
 
 test('a moment is written in Norwegian time', () => {

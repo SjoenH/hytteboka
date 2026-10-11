@@ -1,10 +1,10 @@
 // The pages. Each is handed what it shows, and asks nothing of the book itself.
 
-import { isEntered, sameName, Uke } from './cabin.js';
+import { isEntered, sameName, uke, Uke } from './cabin.js';
 import { html } from './html.js';
-import { CHANGEOVER_HOUR, formatMoment, formatRange, monthOf, weekNumber } from './weeks.js';
+import { CHANGEOVER_HOUR, formatMoment, formatRange, monthOf, weekNumber, yearOf } from './weeks.js';
 
-export function calendarPage({ weeks, today, name, message, typedName }) {
+export function calendarPage({ weeks, today, name, wins, message, typedName }) {
   const months = [];
   for (const entry of weeks) {
     const title = monthOf(entry.week);
@@ -35,14 +35,14 @@ export function calendarPage({ weeks, today, name, message, typedName }) {
       <section class="month">
         <h2>${month.title}</h2>
         <ul class="weeks">
-          ${month.weeks.map((entry) => weekCard(entry, { name, today }))}
+          ${month.weeks.map((entry) => weekCard(entry, { name, today, wins }))}
         </ul>
       </section>
     `)}
   `);
 }
 
-function weekCard({ week, booking, draw }, { name, today }) {
+function weekCard({ week, booking, draw }, { name, today, wins }) {
   const mine = Boolean(booking && name && sameName(booking.name, name));
   const state = draw ? (booking ? 'drawn' : 'draw') : booking ? 'booked' : 'free';
   const post = (action, label, quiet = false) => html`
@@ -60,8 +60,12 @@ function weekCard({ week, booking, draw }, { name, today }) {
     if (mine) action = post('avbestill', 'Si fra deg uka', true);
   } else if (state === 'draw') {
     const entered = Boolean(name && isEntered(draw, name));
-    status = html`${countEntered(draw.entries.length)}${entered ? html`<br><strong>Du er med i trekningen</strong>` : ''}`;
-    if (name) action = entered ? post('meld-av', 'Meld meg av', true) : post('meld-pa', 'Meld meg på');
+    // Nobody wins two weeks in the same year: someone who has won one is told so, and is not offered the draw.
+    const won = wins[yearOf(week)];
+    status = html`${countEntered(draw.entries.length)}${entered ? html`<br><strong>Du er med i trekningen</strong>` : ''}${
+      won ? html`<br>Du vant ${uke(won)}, og kan ikke vinne en uke til i ${yearOf(week)}` : ''}`;
+    if (entered) action = post('meld-av', 'Meld meg av', true);
+    else if (name && !won) action = post('meld-pa', 'Meld meg på');
   } else {
     status = mine ? 'Du vant trekningen' : html`<span class="person">${booking.name}</span> vant trekningen`;
     if (mine) action = post('avbestill', 'Si fra deg uka', true);
@@ -121,7 +125,7 @@ export function drawPage({ week, draw, booking, message }) {
 
       ${!drawn && names.length > 0 ? html`
         <form class="draw-form" method="post" action="/trekning/${week}/trekk" data-draw-form>
-          <p class="draw-count">${names.length} lodd i hatten</p>
+          <p class="draw-count">${names.length} lodd i hatten. Ingen vinner to uker samme år.</p>
           <label class="ready">
             <input type="checkbox" name="klar" value="ja" required>
             Alle som skal se på, er her

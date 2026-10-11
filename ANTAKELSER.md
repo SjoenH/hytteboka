@@ -10,6 +10,10 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
   Hytteuka går alltid fra lørdag til lørdag, og de som reiser, er ute til klokka tolv. (Svar 11. oktober 2026.)
   Første versjon antok mandag til søndag, og at folk avtalte byttet seg imellom. Det var feil.
 
+- **Kan én person vinne flere trekninger?**
+  Den som vinner en trekning, kan ikke vinne en uke til samme år. (Svar på telefon 11. oktober 2026.)
+  Første versjon antok at man kunne vinne flere. Det var feil.
+
 ## Uker og booking
 
 1. **Hvilken hytteuke er «uke 8»?**
@@ -44,32 +48,41 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
 10. **Har alle lik sjanse?**
     Antar: ja. Ett lodd per person, og den som fikk påsken i fjor, stiller likt med alle andre.
 
-11. **Kan én person være med i flere trekninger, og vinne flere?**
-    Antar: ja.
+11. **Hva er «samme år» når ingen kan vinne to uker?**
+    Antar: året uka ligger i, ikke året det trekkes. Vinterferien 2027 og påsken 2027 er samme år, også om den ene trekkes før jul og den andre etter.
 
-12. **Når stenger påmeldingen?**
+12. **Hvilket år hører en uke rundt nyttår til?**
+    Antar: året de fleste nettene ligger i. Uka fra 26. desember 2026 til 2. januar 2027 teller for 2026.
+
+13. **Kan man være med i flere trekninger samme år?**
+    Antar: ja, fram til man vinner en av dem. Da tas loddene ut av de andre trekningene det året, og man kan ikke melde seg på flere.
+
+14. **Gjelder regelen bare trekninger?**
+    Antar: ja. Vanlige uker kan alle booke så mange de vil av, også den som har vunnet en trekning.
+
+15. **Når stenger påmeldingen?**
     Antar: i det du trekker. Fram til da kan folk melde seg på og av.
 
-13. **Hva skjer hvis vinneren ikke kan likevel?**
-    Antar: vinneren sier fra seg uka, og du trekker på nytt blant de andre som var påmeldt.
+16. **Hva skjer hvis vinneren ikke kan likevel?**
+    Antar: vinneren sier fra seg uka, og du trekker på nytt blant de andre som var påmeldt. Den som sa fra seg uka, har da ikke vunnet noe det året, og kan melde seg på andre trekninger igjen.
 
-14. **Hvor ser kontoret trekningen?**
+17. **Hvor ser kontoret trekningen?**
     Antar: på én felles skjerm, der du trykker på knappen. Showet går på den skjermen. Andre som har siden oppe, ser hvem som vant når de laster den på nytt.
 
 ## Hvem er hvem
 
-15. **Holder det at folk skriver navnet sitt?**
+18. **Holder det at folk skriver navnet sitt?**
     Antar: ja, og da følger det at alle kan skrive hvilket som helst navn. Hvem som helst kan altså booke eller avbestille for en annen, og hvem som helst kan åpne «For kontorsjefen» og trekke. Første versjon stoler på at folk ikke gjør det.
 
-16. **Hva med to som heter det samme?**
+19. **Hva med to som heter det samme?**
     Antar: folk skriver fullt navn. Store og små bokstaver spiller ingen rolle, så «ola nordmann» og «Ola Nordmann» er samme person. To som heter helt likt, blir én person for siden.
 
-17. **Skal alle se hvem som har booket, og hvem som er med i en trekning?**
+20. **Skal alle se hvem som har booket, og hvem som er med i en trekning?**
     Antar: ja. Navnet står på uka i kalenderen, og alle loddene vises på trekningssiden.
 
 ## Drift
 
-18. **Hvor skal siden stå?**
+21. **Hvor skal siden stå?**
     Antar: i dag på min maskin, for å vise deg. Hvor den skal stå for at alle førti skal nå den, avtaler vi etterpå.
 
 ## Ikke med i første versjon

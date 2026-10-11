@@ -6,7 +6,7 @@
 
 import { readFile } from 'node:fs/promises';
 import {
-  book, calendar, cancel, describe, drawWinner, enter, markDraw, readName, unmarkDraw, withdraw,
+  book, calendar, cancel, describe, drawWinner, enter, markDraw, readName, unmarkDraw, winsOf, withdraw,
 } from './cabin.js';
 import { calendarPage, drawPage, managerPage, messagePage } from './pages.js';
 import { currentWeek, isWeekId } from './weeks.js';
@@ -52,7 +52,13 @@ export function createApp({ store, now = () => new Date() }) {
       send(404, messagePage({ title: 'Den siden finnes ikke', text: 'Kanskje adressen er skrevet feil.', name }));
 
     const showCalendar = (status = 200, more = {}) =>
-      send(status, calendarPage({ weeks: calendar(store.state, today()), today: today(), name, ...more }));
+      send(status, calendarPage({
+        weeks: calendar(store.state, today()),
+        today: today(),
+        name,
+        wins: winsOf(store.state, name),
+        ...more,
+      }));
 
     const showManager = (status = 200, message) => {
       const weeks = calendar(store.state, today());

@@ -120,9 +120,20 @@ export function formatRange(id, { year = true } = {}) {
 
 /** The month a week is listed under: the one most of its seven nights fall in. */
 export function monthOf(id) {
-  const middleNight = new Date(startOf(id).getTime() + 3 * DAY);
-  const name = MONTHS[middleNight.getUTCMonth()];
-  return `${name[0].toUpperCase()}${name.slice(1)} ${middleNight.getUTCFullYear()}`;
+  const name = MONTHS[middleNight(id).getUTCMonth()];
+  return `${name[0].toUpperCase()}${name.slice(1)} ${yearOf(id)}`;
+}
+
+/**
+ * The year a week counts for: the one most of its seven nights fall in. Around New Year that
+ * is not always the year in its name: "2026-W01" starts on 27 December 2025 and counts for 2025.
+ */
+export function yearOf(id) {
+  return middleNight(id).getUTCFullYear();
+}
+
+function middleNight(id) {
+  return new Date(startOf(id).getTime() + 3 * DAY);
 }
 
 /** "11. oktober 2026 kl. 15:42", in Norwegian time, from a stored moment. */
