@@ -4,6 +4,10 @@
 
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+/** Where the book is: the server writes it there, and `overview.js` reads it there. */
+export const BOOK_FILE = fileURLToPath(new URL('../data/hytteboka.json', import.meta.url));
 
 /** Opens the book in `file`. A file that is not there yet is made from `first()`. */
 export function openStore(file, first) {

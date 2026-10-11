@@ -85,6 +85,20 @@ Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt
 21. **Hvor skal siden stå?**
     Antar: i dag på min maskin, for å vise deg. Hvor den skal stå for at alle førti skal nå den, avtaler vi etterpå.
 
+## Fredagsoversikten
+
+22. **Hvilke fire uker skal med?**
+    Antar: de fire etter uka vi er i. Sender du på fredag, starter den første dagen etter. Uka som er i gang, er ikke med.
+
+23. **Hva skal stå om en uke det trekkes lodd om?**
+    Antar: at det er trekning, og hvor mange som er påmeldt, men ikke navnene. Etter trekningen står vinneren.
+
+24. **Skal teksten ha hilsen og underskrift?**
+    Antar: nei. Den er bare oversikten og regelen om lørdag klokka tolv. Resten skriver du selv.
+
+25. **Hvor lager du den?**
+    Antar: i Claude Code i dette prosjektet, på maskinen der boka ligger, med `/oversikt`.
+
 ## Ikke med i første versjon
 
 Du har ikke bedt om dette, så det er ikke bygget: innlogging, varsel på e-post, venteliste på vanlige uker, regler for hvem som fikk hva i fjor, historikk over tidligere trekninger, og priser eller betaling.
