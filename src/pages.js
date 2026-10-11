@@ -83,6 +83,7 @@ function weekCard({ week, booking, draw }, { name, today, wins }) {
       ${action || draw ? html`
         <div class="week-actions">
           ${action}
+          ${mine ? html`<a href="/uker/${week}/kalender.ics">Legg i kalenderen din</a>` : ''}
           ${draw ? html`<a href="/trekning/${week}">Se trekningen</a>` : ''}
         </div>` : ''}
     </li>`;

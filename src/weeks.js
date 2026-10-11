@@ -50,6 +50,18 @@ export function endOf(id) {
   return start && new Date(start.getTime() + 7 * DAY);
 }
 
+/** The moment a week starts: twelve on its first Saturday, on the clock in Norway. */
+export function startsAt(id) {
+  const day = startOf(id);
+  return day && changeoverOn(day);
+}
+
+/** The moment a week ends, which is the moment the next one starts. */
+export function endsAt(id) {
+  const day = endOf(id);
+  return day && changeoverOn(day);
+}
+
 export function isWeekId(id) {
   return typeof id === 'string' && mondayIn(id) !== null;
 }
@@ -134,6 +146,15 @@ export function yearOf(id) {
 
 function middleNight(id) {
   return new Date(startOf(id).getTime() + 3 * DAY);
+}
+
+/** Twelve on the clock in Norway on a calendar day, as the moment it is everywhere. */
+function changeoverOn(day) {
+  // Norway is one hour ahead of UTC in winter and two in summer, and the clock is set at night,
+  // never near twelve. So the hour Norway shows when UTC shows twelve says how far ahead it is that day.
+  const utc = day.getTime() + CHANGEOVER_HOUR * HOUR;
+  const shown = osloClock.formatToParts(new Date(utc)).find((part) => part.type === 'hour').value;
+  return new Date(utc - (Number(shown) - CHANGEOVER_HOUR) * HOUR);
 }
 
 /** "11. oktober 2026 kl. 15:42", in Norwegian time, from a stored moment. */
