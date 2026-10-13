@@ -4,7 +4,7 @@ Booking av firmahytta, med trekning om ukene alle vil ha.
 
 Dette er en prøvekjøring av øvelsen i Miles-kurset «Agentisk koding», som holdes 14. oktober 2026. Den ble gjort 11. oktober 2026: Claude Code fikk én melding fra en oppdiktet kunde og bygget resten derfra. Historikken følger kundens meldinger, én commit for hver ting hun ber om.
 
-På kurset bygger deltakerne sin egen utgave fra en tom mappe. Denne er til å se på etterpå, ikke til å kopiere fra underveis.
+På kurset begynner deltakerne på første utgave, som ligger på grenen `start`, og tar den videre selv. Denne grenen viser hvordan det gikk da vi prøvde: den er til å se på etterpå, ikke til å kopiere fra underveis.
 
 ## Oppdraget
 
@@ -30,7 +30,7 @@ Hele historien står i [HISTORIEN.md](HISTORIEN.md): hva kunden sa i hver runde,
 npm start
 ```
 
-Åpne så http://localhost:44210. Den er laget og prøvd med Node.js 24, og har ingen avhengigheter.
+Åpne så http://localhost:44210. Den trenger Node.js 20 eller nyere, og har ingen avhengigheter. Den er laget med Node.js 24, og testene går også på 20 og 22.
 
 Testene kjører du med `npm test`.
 

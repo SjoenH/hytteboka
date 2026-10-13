@@ -5,7 +5,7 @@
   "description": "Booking av firmahytta til Havbris AS, med loddtrekning om ukene alle vil ha.",
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": ">=20"
   },
   "scripts": {
     "start": "node server.js",
