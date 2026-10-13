@@ -165,7 +165,7 @@ describe('the cabin week', () => {
   });
 });
 
-// Ragnhild wrote that the page says the cabin is taken when one group leaves and the next arrives
+// Gro wrote that the page says the cabin is taken when one group leaves and the next arrives
 // the same day. That was when the day was Saturday; it is Friday now, and these go through one:
 // 16 October 2026, when
 // Ola's week (10 to 17 October) ends and Kari's (17 to 24 October) starts.
@@ -304,7 +304,7 @@ describe('booking', () => {
   });
 });
 
-// Ragnhild asked for a waiting list when the week is taken. Ola has the autumn week, 31 October to 7 November.
+// Gro asked for a waiting list when the week is taken. Ola has the autumn week, 31 October to 7 November.
 describe('the waiting list', () => {
   const WEEK = 'Uke 45 fre. 30. oktober – fre. 6. november';
   const nina = person('Nina Berg');
@@ -627,7 +627,7 @@ describe('the draw', () => {
   });
 });
 
-// Ragnhild's rule: whoever wins a draw cannot win another week the same year.
+// Gro's rule: whoever wins a draw cannot win another week the same year.
 describe('nobody wins two weeks in the same year', () => {
   const WINTER = '2027-W08';
   const everyone = ['Ola Nordmann', 'Kari Hansen', 'Per Olsen'];
@@ -745,7 +745,7 @@ describe('for the office manager', () => {
   });
 });
 
-// Ragnhild asked that people get their booking into their calendar: the one they keep themselves,
+// Gro asked that people get their booking into their calendar: the one they keep themselves,
 // in Outlook or on the phone. Whoever has a week is handed it as a file such a calendar reads.
 describe('the booking in your own calendar', () => {
   const FILE = `/uker/${AUTUMN}/kalender.ics`;
@@ -984,7 +984,7 @@ describe('a week from the waiting list, in your own calendar', () => {
   });
 });
 
-// Ragnhild's rule: Easter is one trip, from the Friday before Palm Sunday to the Friday after Easter
+// Gro's rule: Easter is one trip, from the Friday before Palm Sunday to the Friday after Easter
 // Monday, and one winner has all of it, since nobody goes to the mountains for half an Easter.
 // In 2027 that is week 12 and week 13: Friday 19 March to Friday 2 April.
 describe('Easter is one trip', () => {

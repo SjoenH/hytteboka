@@ -100,7 +100,7 @@ describe('giving a week up', () => {
   });
 });
 
-// Ragnhild asked for a waiting list when the week is taken.
+// Gro asked for a waiting list when the week is taken.
 describe('waiting for a week that is taken', () => {
   const LATER = '2026-10-20T09:30:00.000Z';
   const names = (state, week = AUTUMN) => waitingFor(state, week).map((entry) => entry.name);
@@ -369,7 +369,7 @@ describe('drawing the winner', () => {
   });
 });
 
-// Ragnhild's rule: whoever wins a draw cannot win another week the same year.
+// Gro's rule: whoever wins a draw cannot win another week the same year.
 describe('nobody wins two weeks in the same year', () => {
   const WINTER = '2027-W08';
   const people = ['Ola Nordmann', 'Kari Hansen', 'Per Olsen'];
@@ -507,7 +507,7 @@ describe('nobody wins two weeks in the same year', () => {
   });
 });
 
-// Ragnhild's rule: Easter is one trip, from the Friday before Palm Sunday to the Friday after Easter
+// Gro's rule: Easter is one trip, from the Friday before Palm Sunday to the Friday after Easter
 // Monday, and one winner has all of it. Her reason: nobody goes to the mountains for half an Easter.
 // In 2027 that is week 12 and week 13, 19 March to 2 April.
 describe('Easter is one trip of two weeks', () => {

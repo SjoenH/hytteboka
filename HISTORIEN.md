@@ -4,6 +4,8 @@ Dette er historien om hvordan Hytteboka ble til, runde for runde: hva kunden sa,
 
 Hytteboka er en prøvekjøring av øvelsen i Miles-kurset «Agentisk koding». Den ble gjort søndag 11. oktober 2026, tre dager før kurset, for å se om øvelsen holder.
 
+Kunden het Ragnhild da prøvekjøringen ble gjort, og slik står hun her, i meldingene, promptene og commitene. I kurset og i resten av prosjektet heter hun Gro.
+
 ## Slik ble prøvekjøringen gjort
 
 - **Kunden er oppdiktet.** Ragnhild er kontorsjef i Havbris AS, og meldingene hennes er skrevet på forhånd som en del av kurset. Hun kommer tilbake med en ny melding i hver leksjon.

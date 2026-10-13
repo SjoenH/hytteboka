@@ -33,7 +33,7 @@ export function emptyState() {
   return { bookings: {}, draws: {}, waiting: {} };
 }
 
-/** What the book holds the first time it is opened: the weeks Ragnhild named, set up for a draw. */
+/** What the book holds the first time it is opened: the weeks Gro named, set up for a draw. */
 export function firstState(now = new Date()) {
   const state = emptyState();
   const today = currentWeek(now);

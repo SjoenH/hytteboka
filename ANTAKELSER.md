@@ -1,10 +1,10 @@
 # Antakelser
 
-Ragnhild var ikke å få tak i før første versjon ble bygget. Her er det jeg ville ha spurt om, og svaret jeg har bygget etter. Alt kan endres; si fra om det som er feil.
+Gro var ikke å få tak i før første versjon ble bygget. Her er det jeg ville ha spurt om, og svaret jeg har bygget etter. Alt kan endres; si fra om det som er feil.
 
 Det hun har svart på siden, står først, under «Avklart». Resten er fortsatt antakelser.
 
-## Avklart av Ragnhild
+## Avklart av Gro
 
 - **Hva er «en uke» på hytta?**
   Hytteuka går fra fredag til fredag, og de som reiser, er ute til klokka tolv. Da får de som kommer, hele helga på fjellet, og de som reiser, har helga hjemme. (Svar 11. oktober 2026.)

@@ -1,6 +1,6 @@
 // A week on the cabin runs from Friday to Friday, Norwegian time. Those who leave are out by
 // twelve, so the cleaner gets through before the next group comes after work. Those who come get
-// the whole weekend on the mountain, and those who leave have theirs at home. That is Ragnhild's
+// the whole weekend on the mountain, and those who leave have theirs at home. That is Gro's
 // rule and her reason. It is not a week of the calendar, which runs from Monday to Sunday.
 //
 // So a week has two moments on its first Friday. At twelve it changes hands: the week before it
@@ -21,7 +21,7 @@ const CHANGEOVER_DAY = { daysBeforeMonday: 3, name: 'fredag', short: 'fre.' };
 /** The hour, on the clock in Norway, when a week ends on its last Friday: those who leave are out by then. */
 export const CHANGEOVER_HOUR = 12;
 
-/** The hour those who have the week may come from. Ragnhild said "etter jobb"; four o'clock is our reading of it. */
+/** The hour those who have the week may come from. Gro said "etter jobb"; four o'clock is our reading of it. */
 export const ARRIVAL_HOUR = 16;
 
 /** The rule as people are told it: on the calendar page, in the Friday overview and in the calendar file. */
@@ -127,7 +127,7 @@ export function easterSunday(year) {
 
 /**
  * Easter on the cabin is one trip of two weeks: from the Friday before Palm Sunday to the Friday
- * after Easter Monday. That is Ragnhild's rule, and her reason: nobody goes to the mountains for
+ * after Easter Monday. That is Gro's rule, and her reason: nobody goes to the mountains for
  * half an Easter. So the Good Friday in the middle is no changeover.
  * `week` is the first of the two, the one with Palm Sunday and Maundy Thursday in it, and
  * `through` the second, with Easter Sunday and Easter Monday.
